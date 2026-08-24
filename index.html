@@ -1,0 +1,6168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXORA — Espace financier</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+--navy:#07111f;
+--navy2:#102442;
+--blue:#2563eb;
+--blue2:#3b82f6;
+--blueSoft:#edf4ff;
+--text:#101827;
+--muted:#7c8798;
+--line:#e6ebf2;
+--bg:#f6f8fc;
+--white:#fff;
+--green:#079669;
+--greenSoft:#eaf9f3;
+--red:#df4d5b;
+--gold:#d4af37;
+--gold2:#f4d675;
+}
+
+body{
+font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+background:var(--bg);
+color:var(--text);
+min-height:100vh;
+}
+
+button,input,select{font:inherit}
+button{cursor:pointer}
+
+.screen{display:none}
+.screen.active{display:block}
+
+/* =========================
+   ACCUEIL
+========================= */
+
+.home{
+min-height:100vh;
+background:
+radial-gradient(circle at 90% 5%,rgba(48,105,235,.18),transparent 27%),
+linear-gradient(135deg,#07111f,#102442 65%,#183665);
+color:white;
+overflow:hidden;
+position:relative;
+}
+
+.home:after{
+content:"";
+position:absolute;
+width:500px;
+height:500px;
+border:1px solid rgba(255,255,255,.05);
+border-radius:50%;
+right:-250px;
+bottom:-260px;
+}
+
+.home-header{
+height:78px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 clamp(20px,6vw,90px);
+position:relative;
+z-index:2;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:11px;
+}
+
+.logo-mark{
+width:42px;
+height:42px;
+border-radius:13px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(145deg,#4c8aff,#1746b5);
+font-weight:900;
+box-shadow:0 10px 25px rgba(0,0,0,.18);
+}
+
+.logo-name{
+font-weight:850;
+font-size:18px;
+letter-spacing:1px;
+}
+
+.logo-sub{
+font-size:7px;
+color:#93a2ba;
+letter-spacing:2px;
+margin-top:3px;
+}
+
+.home-login{
+border:1px solid rgba(255,255,255,.16);
+background:rgba(255,255,255,.06);
+color:white;
+padding:11px 18px;
+border-radius:10px;
+font-size:11px;
+font-weight:700;
+}
+
+.home-content{
+width:min(1120px,100%);
+margin:auto;
+min-height:calc(100vh - 78px);
+padding:70px clamp(20px,6vw,80px);
+display:grid;
+grid-template-columns:1.15fr .85fr;
+align-items:center;
+gap:70px;
+position:relative;
+z-index:1;
+}
+
+.home-eyebrow{
+font-size:10px;
+letter-spacing:2.4px;
+font-weight:800;
+color:#78a5ff;
+margin-bottom:18px;
+}
+
+.home h1{
+font-size:clamp(40px,6vw,68px);
+line-height:1.02;
+letter-spacing:-2.5px;
+max-width:680px;
+}
+
+.home h1 span{
+color:#72a1ff;
+}
+
+.home-text{
+color:#a9b7cc;
+font-size:14px;
+line-height:1.8;
+max-width:550px;
+margin-top:22px;
+}
+
+.home-buttons{
+display:flex;
+gap:12px;
+margin-top:30px;
+flex-wrap:wrap;
+}
+
+.btn-primary{
+border:0;
+background:#fff;
+color:#1451c7;
+padding:15px 22px;
+border-radius:12px;
+font-size:11px;
+font-weight:800;
+box-shadow:0 12px 30px rgba(0,0,0,.16);
+}
+
+.btn-outline{
+border:1px solid rgba(255,255,255,.2);
+background:rgba(255,255,255,.05);
+color:white;
+padding:15px 22px;
+border-radius:12px;
+font-size:11px;
+font-weight:750;
+}
+
+.home-features{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:45px;
+}
+
+.feature{
+border-top:1px solid rgba(255,255,255,.12);
+padding-top:14px;
+}
+
+.feature strong{
+font-size:11px;
+display:block;
+}
+
+.feature span{
+font-size:9px;
+color:#8595ad;
+display:block;
+margin-top:5px;
+}
+
+.phone-card{
+width:min(320px,100%);
+margin:auto;
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.13);
+border-radius:28px;
+padding:12px;
+box-shadow:0 30px 80px rgba(0,0,0,.3);
+backdrop-filter:blur(15px);
+transform:rotate(2deg);
+}
+
+.phone-inner{
+background:#f8fafc;
+border-radius:20px;
+padding:20px;
+color:#111827;
+min-height:390px;
+}
+
+.phone-top{
+display:flex;
+justify-content:space-between;
+font-size:8px;
+color:#8791a0;
+}
+
+.phone-balance{
+background:linear-gradient(135deg,#0b1220,#173568);
+color:white;
+border-radius:17px;
+padding:20px;
+margin-top:20px;
+}
+
+.phone-balance small{
+color:#a5b4c9;
+font-size:8px;
+letter-spacing:1px;
+}
+
+.phone-balance strong{
+display:block;
+font-size:26px;
+margin-top:7px;
+}
+
+.phone-row{
+display:flex;
+gap:10px;
+margin-top:12px;
+}
+
+.phone-action{
+flex:1;
+height:52px;
+border-radius:12px;
+background:#edf4ff;
+color:#2563eb;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:9px;
+font-weight:800;
+}
+
+/* =========================
+   AUTHENTIFICATION
+========================= */
+
+.auth{
+min-height:100vh;
+display:flex;
+background:#f6f8fc;
+}
+
+.auth-side{
+width:42%;
+background:
+radial-gradient(circle at 80% 20%,rgba(65,122,255,.25),transparent 30%),
+linear-gradient(145deg,#07111f,#132a4e);
+color:white;
+padding:50px clamp(25px,5vw,75px);
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+}
+
+.auth-side h1{
+font-size:42px;
+line-height:1.05;
+letter-spacing:-1.7px;
+margin-top:70px;
+}
+
+.auth-side p{
+color:#9aaac1;
+font-size:12px;
+line-height:1.8;
+margin-top:18px;
+max-width:430px;
+}
+
+.security{
+display:flex;
+align-items:center;
+gap:9px;
+color:#91a1b8;
+font-size:9px;
+}
+
+.security i{
+width:7px;
+height:7px;
+border-radius:50%;
+background:#25c995;
+}
+
+.auth-main{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:30px;
+}
+
+.auth-box{
+width:min(470px,100%);
+background:white;
+border:1px solid var(--line);
+border-radius:23px;
+padding:34px;
+box-shadow:0 25px 70px rgba(20,36,60,.08);
+}
+
+.back{
+border:0;
+background:var(--blueSoft);
+color:var(--blue);
+font-size:10px;
+font-weight:800;
+padding:9px 14px;
+border-radius:10px;
+margin-bottom:28px;
+display:inline-flex;
+align-items:center;
+gap:6px;
+transition:background .15s;
+}
+
+.back:hover{
+background:#e0ebff;
+}
+
+.auth-label{
+color:#2563eb;
+font-size:9px;
+font-weight:850;
+letter-spacing:1.5px;
+}
+
+.auth-box h2{
+font-size:27px;
+letter-spacing:-.8px;
+margin-top:7px;
+}
+
+.auth-box > p{
+font-size:11px;
+color:#8993a3;
+margin-top:7px;
+line-height:1.6;
+}
+
+.auth-form{
+margin-top:22px;
+}
+
+.field-label{
+display:block;
+font-size:9px;
+font-weight:800;
+color:#707b8d;
+letter-spacing:.8px;
+margin:16px 0 7px;
+}
+
+.input{
+width:100%;
+height:48px;
+border:1px solid #dce2ea;
+border-radius:10px;
+padding:0 13px;
+outline:none;
+font-size:12px;
+background:white;
+}
+
+.input:focus{
+border-color:#5b88e8;
+box-shadow:0 0 0 3px rgba(37,99,235,.07);
+}
+
+.form-two{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.auth-submit{
+width:100%;
+height:51px;
+margin-top:21px;
+border:0;
+border-radius:11px;
+background:linear-gradient(135deg,#3272ed,#1d4ed8);
+color:white;
+font-size:11px;
+font-weight:800;
+box-shadow:0 10px 23px rgba(37,99,235,.2);
+}
+
+.switch{
+text-align:center;
+font-size:10px;
+color:#8791a0;
+margin-top:17px;
+}
+
+.switch button{
+border:0;
+background:none;
+color:#2563eb;
+font-weight:800;
+font-size:10px;
+}
+
+.checkbox{
+display:flex;
+gap:8px;
+align-items:flex-start;
+margin-top:15px;
+font-size:9px;
+line-height:1.5;
+color:#7e8898;
+}
+
+.checkbox input{margin-top:2px}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.dashboard-header{
+height:72px;
+background:rgba(255,255,255,.96);
+border-bottom:1px solid var(--line);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 clamp(18px,4vw,55px);
+position:sticky;
+top:0;
+z-index:50;
+}
+
+.dash-brand{
+display:flex;
+align-items:center;
+gap:11px;
+}
+
+.dash-mark{
+width:39px;
+height:39px;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(145deg,#3b82f6,#1745b8);
+color:white;
+font-size:17px;
+font-weight:800;
+}
+
+.dash-name{
+font-size:17px;
+font-weight:800;
+letter-spacing:.8px;
+}
+
+.dash-sub{
+color:#9aa3b2;
+font-size:8px;
+letter-spacing:1.7px;
+margin-top:2px;
+}
+
+.header-right{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.bell{
+width:40px;
+height:40px;
+border:1px solid var(--line);
+background:white;
+border-radius:12px;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#354052;
+}
+
+.bell-dot{
+position:absolute;
+width:7px;
+height:7px;
+border-radius:50%;
+background:#ef4444;
+right:8px;
+top:7px;
+border:2px solid white;
+}
+
+.profile{
+display:flex;
+align-items:center;
+gap:9px;
+}
+
+.avatar{
+width:38px;
+height:38px;
+border-radius:50%;
+background:#eaf0ff;
+color:#275dc7;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:12px;
+font-weight:800;
+}
+
+.profile-name{
+font-size:12px;
+font-weight:700;
+}
+
+
+.logout-button{
+    width:38px;
+    height:38px;
+    margin-left:4px;
+    border:1px solid #e1e6ee;
+    background:white;
+    color:#667085;
+    border-radius:11px;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+}
+
+.logout-button:hover{
+    background:#fff2f3;
+    color:#d94b5b;
+    border-color:#f0cdd1;
+}
+
+.profile-type{
+color:#9aa3b2;
+font-size:10px;
+margin-top:2px;
+}
+
+.main{
+width:min(1120px,100%);
+margin:auto;
+padding:38px clamp(18px,4vw,40px) 100px;
+}
+
+.greeting{
+margin-bottom:27px;
+}
+
+.greeting-small{
+color:var(--blue);
+font-size:10px;
+font-weight:800;
+letter-spacing:1.7px;
+margin-bottom:8px;
+}
+
+.greeting h1{
+font-size:30px;
+letter-spacing:-1px;
+}
+
+.greeting p{
+color:var(--muted);
+font-size:13px;
+margin-top:6px;
+}
+
+.balance-card{
+min-height:205px;
+border-radius:24px;
+background:
+radial-gradient(circle at 88% 15%,rgba(73,130,255,.35),transparent 25%),
+linear-gradient(135deg,#0b1220,#13264a);
+color:white;
+padding:28px;
+position:relative;
+overflow:hidden;
+box-shadow:0 20px 45px rgba(15,31,61,.18);
+}
+
+.balance-top{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+}
+
+.balance-label{
+color:#9ba9bd;
+font-size:10px;
+letter-spacing:1.6px;
+}
+
+.balance-number{
+margin-top:7px;
+font-size:36px;
+font-weight:750;
+letter-spacing:-1px;
+}
+
+.balance-number small{
+font-size:14px;
+font-weight:500;
+color:#aab5c6;
+}
+
+.secure{
+padding:7px 10px;
+border:1px solid rgba(255,255,255,.1);
+background:rgba(255,255,255,.06);
+border-radius:20px;
+font-size:9px;
+color:#c9d5e6;
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.secure i{
+width:6px;
+height:6px;
+background:#2dd4a0;
+border-radius:50%;
+}
+
+.balance-bottom{
+position:absolute;
+left:28px;
+right:28px;
+bottom:23px;
+display:flex;
+justify-content:space-between;
+}
+
+.balance-meta span{
+display:block;
+font-size:8px;
+color:#78879d;
+letter-spacing:1.2px;
+}
+
+.balance-meta strong{
+display:block;
+margin-top:4px;
+font-size:11px;
+letter-spacing:.3px;
+}
+
+.actions{
+display:grid;
+grid-template-columns:1.3fr 1fr 1fr;
+gap:13px;
+margin:18px 0 28px;
+}
+
+.action{
+border:1px solid var(--line);
+background:white;
+border-radius:16px;
+min-height:72px;
+padding:14px 16px;
+display:flex;
+align-items:center;
+gap:12px;
+text-align:left;
+transition:.2s;
+box-shadow:0 5px 18px rgba(15,23,42,.025);
+}
+
+.action:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 25px rgba(15,23,42,.07);
+}
+
+.action.primary{
+background:var(--blue);
+color:white;
+border-color:var(--blue);
+box-shadow:0 10px 24px rgba(37,99,235,.2);
+}
+
+.action-icon{
+width:40px;
+height:40px;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:18px;
+font-weight:700;
+background:var(--blueSoft);
+color:var(--blue);
+}
+
+.primary .action-icon{
+background:rgba(255,255,255,.14);
+color:white;
+}
+
+.action-text{flex:1}
+
+.action-text strong{
+display:block;
+font-size:13px;
+}
+
+.action-text span{
+display:block;
+font-size:10px;
+margin-top:3px;
+color:#8c96a6;
+}
+
+.primary .action-text span{color:#cbdcff}
+
+.grid{
+display:grid;
+grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);
+gap:18px;
+}
+
+.panel{
+background:white;
+border:1px solid var(--line);
+border-radius:20px;
+overflow:hidden;
+}
+
+.panel-head{
+padding:21px 22px;
+border-bottom:1px solid #eef1f5;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.panel-head small{
+color:var(--blue);
+font-size:9px;
+font-weight:800;
+letter-spacing:1.3px;
+}
+
+.panel-head h2{
+font-size:16px;
+margin-top:4px;
+}
+
+.panel-head button{
+border:0;
+background:none;
+color:var(--blue);
+font-size:11px;
+font-weight:700;
+}
+
+.transaction{
+display:flex;
+align-items:center;
+gap:13px;
+padding:16px 22px;
+border-bottom:1px solid #f0f2f5;
+}
+
+.tx-icon{
+width:42px;
+height:42px;
+border-radius:13px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:17px;
+font-weight:800;
+}
+
+.tx-in{
+background:var(--greenSoft);
+color:var(--green);
+}
+
+.tx-out{
+background:#fff0f2;
+color:var(--red);
+}
+
+.tx-info{flex:1}
+
+.tx-info strong{
+display:block;
+font-size:12px;
+}
+
+.tx-info span{
+display:block;
+color:#8c95a4;
+font-size:10px;
+margin-top:4px;
+}
+
+.tx-ref{
+display:block;
+color:#b0b7c2;
+font-size:8px;
+margin-top:3px;
+}
+
+.tx-value{
+text-align:right;
+font-size:12px;
+font-weight:800;
+}
+
+.tx-value small{
+display:block;
+font-size:8px;
+color:#a0a8b5;
+margin-top:3px;
+}
+
+.tx-positive{color:var(--green)}
+
+.notification{padding:20px}
+
+.notification-item{
+display:flex;
+gap:11px;
+padding:14px 0;
+border-bottom:1px solid #f0f2f5;
+}
+
+.notification-item:last-child{border:0}
+
+.notif-icon{
+width:36px;
+height:36px;
+flex:none;
+border-radius:11px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#edf4ff;
+color:var(--blue);
+}
+
+.notification-item strong{
+display:block;
+font-size:11px;
+}
+
+.notification-item p{
+color:#7e8796;
+font-size:10px;
+line-height:1.5;
+margin-top:4px;
+}
+
+.notification-item time{
+color:#b0b7c2;
+font-size:8px;
+display:block;
+margin-top:4px;
+}
+
+/* MODAL */
+
+.overlay{
+position:fixed;
+inset:0;
+z-index:200;
+display:none;
+align-items:center;
+justify-content:center;
+padding:15px;
+background:rgba(9,17,31,.55);
+backdrop-filter:blur(7px);
+}
+
+.overlay.open{display:flex}
+
+.modal{
+width:min(620px,100%);
+max-height:calc(100vh - 30px);
+overflow:auto;
+background:white;
+border-radius:25px;
+box-shadow:0 30px 80px rgba(0,0,0,.25);
+}
+
+.modal-header{
+padding:27px 28px 20px;
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+}
+
+.modal-label{
+color:var(--blue);
+font-size:9px;
+font-weight:800;
+letter-spacing:1.5px;
+}
+
+.modal-header h2{
+font-size:23px;
+margin-top:6px;
+}
+
+.modal-header p{
+color:#8a93a2;
+font-size:11px;
+margin-top:5px;
+}
+
+.close{
+width:38px;
+height:38px;
+border:0;
+background:#f5f6f8;
+border-radius:11px;
+font-size:20px;
+color:#687284;
+}
+
+.form{
+padding:0 28px 28px;
+}
+
+.form-label{
+display:block;
+color:#788293;
+font-size:9px;
+font-weight:800;
+letter-spacing:1.2px;
+margin:18px 0 9px;
+}
+
+.recipient{
+padding:13px;
+border:1px solid #dfe5ed;
+border-radius:14px;
+display:flex;
+align-items:center;
+gap:11px;
+background:#fbfcfe;
+}
+
+.recipient-avatar{
+width:42px;
+height:42px;
+border-radius:12px;
+background:#eaf1ff;
+color:#2563eb;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:12px;
+font-weight:800;
+}
+
+.recipient-info{flex:1}
+
+.recipient-info strong{
+display:block;
+font-size:12px;
+}
+
+.recipient-info span{
+display:block;
+font-size:9px;
+color:#8c95a4;
+margin-top:3px;
+}
+
+.verified{
+color:#079669;
+font-size:9px;
+font-weight:700;
+}
+
+.field input,
+.field select{
+width:100%;
+height:50px;
+border:1px solid #d9dfe7;
+border-radius:11px;
+outline:none;
+padding:0 14px;
+color:#172033;
+background:white;
+font-size:13px;
+}
+
+.amount{position:relative}
+
+.amount input{
+height:67px;
+font-size:29px;
+font-weight:750;
+padding-right:70px;
+}
+
+.amount span{
+position:absolute;
+right:16px;
+top:50%;
+transform:translateY(-50%);
+font-size:11px;
+font-weight:800;
+color:#8993a3;
+}
+
+.two{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.summary{
+margin-top:20px;
+background:#f7f9fc;
+border:1px solid #e8ecf2;
+border-radius:14px;
+padding:15px;
+}
+
+.summary-row{
+display:flex;
+justify-content:space-between;
+font-size:10px;
+padding:5px 0;
+}
+
+.summary-row span{color:#858e9e}
+
+.summary-total{
+border-top:1px solid #e2e6ec;
+margin-top:7px;
+padding-top:13px;
+font-size:13px;
+}
+
+.send{
+width:100%;
+height:54px;
+margin-top:17px;
+border:0;
+border-radius:12px;
+background:linear-gradient(135deg,#2f6ff0,#1d4ed8);
+color:white;
+font-size:12px;
+font-weight:750;
+}
+
+.success{
+display:none;
+text-align:center;
+padding:45px 28px 38px;
+}
+
+.success.show{display:block}
+
+.success-mark{
+width:70px;
+height:70px;
+margin:auto;
+border-radius:50%;
+background:#eaf9f3;
+color:#079669;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+font-weight:800;
+}
+
+.success h2{
+margin-top:18px;
+font-size:22px;
+}
+
+.success p{
+color:#818b9a;
+font-size:11px;
+line-height:1.6;
+margin-top:7px;
+}
+
+.ref{
+margin-top:20px;
+padding:14px;
+background:#f7f9fc;
+border:1px solid #e7ebf1;
+border-radius:12px;
+}
+
+.ref span{
+display:block;
+font-size:8px;
+color:#9aa3b1;
+letter-spacing:1.3px;
+}
+
+.ref strong{
+display:block;
+font-size:13px;
+margin-top:5px;
+letter-spacing:1px;
+}
+
+.done{
+width:100%;
+height:49px;
+margin-top:16px;
+background:white;
+border:1px solid #dce2e9;
+border-radius:11px;
+font-weight:700;
+font-size:11px;
+}
+
+@media(max-width:850px){
+
+.auth-side{display:none}
+
+.auth-main{padding:18px}
+
+.home-content{
+grid-template-columns:1fr;
+padding-top:55px;
+}
+
+.phone-card{display:none}
+
+.home-features{grid-template-columns:1fr 1fr}
+
+}
+
+@media(max-width:650px){
+
+.home-header{height:68px}
+
+.home-login{padding:9px 12px}
+
+.home-content{
+padding:45px 20px 60px;
+}
+
+.home h1{
+font-size:42px;
+}
+
+.home-features{
+grid-template-columns:1fr;
+}
+
+.auth-box{
+padding:25px 20px;
+}
+
+.actions{
+grid-template-columns:1fr 1fr;
+}
+
+.action.primary{
+grid-column:1/-1;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.profile-name,
+.profile-type{
+display:none;
+}
+
+.dashboard-header{
+padding:0 15px;
+}
+
+.main{
+padding:28px 14px 70px;
+}
+
+.balance-card{
+min-height:190px;
+padding:23px;
+border-radius:20px;
+}
+
+.balance-number{
+font-size:31px;
+}
+
+.balance-bottom{
+left:23px;
+right:23px;
+bottom:20px;
+}
+
+.form-two,
+.two{
+grid-template-columns:1fr;
+}
+
+}
+
+/* ===== Animations Premium ===== */
+
+@keyframes premiumPopIn{
+from{ opacity:0; transform:scale(.92) translateY(10px); }
+to{ opacity:1; transform:scale(1) translateY(0); }
+}
+
+@keyframes premiumFloat{
+0%,100%{ transform:translateY(0); }
+50%{ transform:translateY(-5px); }
+}
+
+@keyframes premiumCardIn{
+from{ opacity:0; transform:translateY(12px); }
+to{ opacity:1; transform:translateY(0); }
+}
+
+@keyframes premiumGlow{
+0%,100%{ box-shadow:0 0 0 1px var(--gold),0 10px 23px rgba(212,175,55,.35); }
+50%{ box-shadow:0 0 0 1px var(--gold2),0 10px 32px rgba(212,175,55,.65); }
+}
+
+@keyframes premiumShine{
+0%{ background-position:-150% 0; }
+100%{ background-position:250% 0; }
+}
+
+#overlayPremium.open .modal{
+animation:premiumPopIn .35s cubic-bezier(.25,.8,.35,1);
+}
+
+.premium-icon{
+animation:premiumFloat 3s ease-in-out infinite;
+}
+
+.premium-card{
+opacity:0;
+animation:premiumCardIn .5s ease-out forwards;
+}
+
+.premium-card:nth-child(1){ animation-delay:.05s; }
+.premium-card:nth-child(2){ animation-delay:.12s; }
+.premium-card:nth-child(3){ animation-delay:.19s; }
+.premium-card:nth-child(4){ animation-delay:.26s; }
+
+.premium-cta{
+position:relative;
+overflow:hidden;
+animation:premiumGlow 2.4s ease-in-out infinite;
+transition:transform .15s ease;
+}
+
+.premium-cta:active{
+transform:scale(.97);
+}
+
+.premium-cta::after{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%);
+background-size:250% 100%;
+animation:premiumShine 2.8s ease-in-out infinite;
+}
+
+@keyframes iconSpark{
+0%,100%{ opacity:.4; transform:scale(.6) rotate(0deg); }
+50%{ opacity:1; transform:scale(1.15) rotate(15deg); }
+}
+
+@keyframes iconDraw{
+from{ stroke-dashoffset:60; }
+to{ stroke-dashoffset:0; }
+}
+
+@keyframes iconBolt{
+0%,100%{ opacity:1; filter:drop-shadow(0 0 0 rgba(37,99,235,0)); }
+45%{ opacity:.55; }
+50%{ opacity:1; filter:drop-shadow(0 0 5px rgba(37,99,235,.7)); }
+55%{ opacity:.55; }
+}
+
+@keyframes barGrow1{ 0%,100%{ height:6px; } 50%{ height:16px; } }
+@keyframes barGrow2{ 0%,100%{ height:12px; } 50%{ height:20px; } }
+@keyframes barGrow3{ 0%,100%{ height:9px; } 50%{ height:14px; } }
+
+.icon-spark{ animation:iconSpark 2.2s ease-in-out infinite; transform-origin:center; }
+.icon-infinity{ stroke-dasharray:60; animation:iconDraw 2.4s linear infinite; }
+.icon-bolt{ animation:iconBolt 2.2s ease-in-out infinite; }
+.icon-bar1{ animation:barGrow1 1.6s ease-in-out infinite; }
+.icon-bar2{ animation:barGrow2 1.6s ease-in-out .2s infinite; }
+.icon-bar3{ animation:barGrow3 1.6s ease-in-out .4s infinite; }
+
+/* ===== Menu compte (déconnexion / suppression) ===== */
+
+.account-menu{
+position:relative;
+}
+
+.account-menu-btn{
+border:0;
+background:transparent;
+color:var(--blue);
+font-size:18px;
+font-weight:800;
+width:34px;
+height:34px;
+border-radius:10px;
+cursor:pointer;
+line-height:1;
+}
+
+.account-menu-btn:hover{
+background:var(--blueSoft);
+color:var(--blue);
+}
+
+.account-dropdown{
+position:absolute;
+top:42px;
+right:0;
+background:transparent;
+border:0;
+box-shadow:none;
+min-width:240px;
+padding:0;
+display:none;
+z-index:50;
+}
+
+.account-dropdown.open{
+display:block;
+}
+
+.account-dropdown .menu-item{
+display:flex;
+align-items:center;
+gap:10px;
+width:100%;
+border:1px solid var(--blue);
+background:var(--blue);
+text-align:left;
+padding:14px 16px;
+border-radius:14px;
+font-size:12.5px;
+font-weight:700;
+color:white;
+cursor:pointer;
+box-shadow:0 10px 24px rgba(37,99,235,.2);
+margin-bottom:8px;
+transition:.15s;
+}
+
+.account-dropdown .menu-item:last-child{
+margin-bottom:0;
+}
+
+.account-dropdown .menu-item:hover{
+background:var(--blue2);
+border-color:var(--blue2);
+transform:translateY(-1px);
+}
+
+.account-dropdown .menu-item.danger{
+color:white;
+}
+
+.account-dropdown .menu-sep{
+display:none;
+}
+
+.btn-danger{
+border:0;
+background:var(--blue);
+color:white;
+padding:14px 22px;
+border-radius:11px;
+font-size:11px;
+font-weight:800;
+cursor:pointer;
+box-shadow:0 10px 24px rgba(37,99,235,.2);
+transition:background .15s ease,box-shadow .15s ease;
+}
+
+/* =====================================================
+   NEXORA PREMIUM — DESIGN LUXE
+===================================================== */
+
+#premiumDashboard{
+    display:none;
+    position:relative;
+    overflow:hidden;
+    margin:24px 0;
+    padding:24px;
+    border-radius:24px;
+
+    background:
+        radial-gradient(circle at 10% 0%,rgba(255,215,90,.20),transparent 32%),
+        radial-gradient(circle at 90% 100%,rgba(212,175,55,.13),transparent 35%),
+        linear-gradient(145deg,#171717,#090909);
+
+    border:1px solid rgba(231,194,72,.55);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.25),
+        0 0 45px rgba(212,175,55,.12);
+
+    color:white;
+
+    animation:
+        premiumAppear .65s cubic-bezier(.2,.8,.2,1);
+}
+
+#premiumDashboard.visible{
+    display:block;
+}
+
+#premiumDashboard::before{
+    content:"";
+    position:absolute;
+    top:-100%;
+    left:-45%;
+    width:35%;
+    height:300%;
+    transform:rotate(25deg);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.18),
+        transparent
+    );
+
+    animation:premiumShine 5s ease-in-out infinite;
+}
+
+#premiumDashboard::after{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius:25px;
+    pointer-events:none;
+
+    box-shadow:
+        inset 0 0 35px rgba(255,215,90,.06),
+        0 0 30px rgba(212,175,55,.08);
+
+    animation:premiumGlow 3s ease-in-out infinite;
+}
+
+.premium-top{
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:22px;
+}
+
+.premium-title-wrap{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.premium-crown{
+    width:48px;
+    height:48px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:15px;
+
+    background:
+        linear-gradient(145deg,#f9df79,#b88616);
+
+    color:#211800;
+
+    font-size:22px;
+
+    box-shadow:
+        0 8px 25px rgba(212,175,55,.28),
+        inset 0 1px rgba(255,255,255,.7);
+
+    animation:
+        crownFloat 3s ease-in-out infinite;
+}
+
+.premium-main-title{
+    font-size:17px;
+    font-weight:950;
+    letter-spacing:.2px;
+}
+
+.premium-subtitle{
+    margin-top:4px;
+    font-size:9px;
+    color:#bcbcbc;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.premium-gold-badge{
+    position:relative;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    padding:8px 13px;
+
+    border-radius:999px;
+
+    background:
+        linear-gradient(135deg,#ffe889,#d0a62c);
+
+    color:#171100;
+
+    font-size:9px;
+    font-weight:950;
+    letter-spacing:1px;
+
+    box-shadow:
+        0 7px 20px rgba(212,175,55,.25);
+}
+
+.premium-gold-badge::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-80%;
+
+    width:45%;
+    height:100%;
+
+    transform:skewX(-20deg);
+
+    background:rgba(255,255,255,.55);
+
+    animation:badgeShine 3.5s infinite;
+}
+
+.premium-status{
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    align-items:center;
+    gap:7px;
+
+    margin-bottom:18px;
+
+    font-size:9px;
+    color:#c9c9c9;
+}
+
+.premium-status-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+
+    background:#e6c65b;
+
+    box-shadow:
+        0 0 0 4px rgba(230,198,91,.08),
+        0 0 15px rgba(230,198,91,.7);
+
+    animation:statusPulse 1.8s infinite;
+}
+
+.premium-kpis{
+    position:relative;
+    z-index:2;
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+.premium-kpi{
+    position:relative;
+    overflow:hidden;
+
+    padding:17px;
+
+    border-radius:17px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.09),
+            rgba(255,255,255,.025)
+        );
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(8px);
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+
+    animation:premiumCardIn .55s both;
+}
+
+.premium-kpi:nth-child(2){
+    animation-delay:.1s;
+}
+
+.premium-kpi:nth-child(3){
+    animation-delay:.2s;
+}
+
+.premium-kpi:hover{
+    transform:translateY(-5px);
+
+    border-color:rgba(231,194,72,.45);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.22),
+        0 0 20px rgba(212,175,55,.08);
+}
+
+.premium-kpi-label{
+    font-size:8px;
+    color:#aaa;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.premium-kpi-value{
+    margin-top:8px;
+
+    font-size:21px;
+    font-weight:950;
+
+    background:
+        linear-gradient(135deg,#fff,#e4c45c);
+
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+
+.premium-chart-card{
+    position:relative;
+    z-index:2;
+
+    margin-top:14px;
+    padding:18px;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.025)
+        );
+
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.premium-chart-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:15px;
+}
+
+.premium-chart-title{
+    font-size:11px;
+    font-weight:850;
+}
+
+.premium-chart-caption{
+    font-size:8px;
+    color:#929292;
+}
+
+.premium-chart{
+    height:150px;
+
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:8px;
+
+    padding:10px 4px 0;
+}
+
+.premium-chart-bar{
+    flex:1;
+    max-width:30px;
+
+    height:0;
+
+    border-radius:7px 7px 2px 2px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffe889,
+            #b88616
+        );
+
+    box-shadow:
+        0 0 12px rgba(212,175,55,.12);
+
+    animation:
+        chartGrow 1.2s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.premium-chart-bar:nth-child(1){animation-delay:.15s}
+.premium-chart-bar:nth-child(2){animation-delay:.25s}
+.premium-chart-bar:nth-child(3){animation-delay:.35s}
+.premium-chart-bar:nth-child(4){animation-delay:.45s}
+.premium-chart-bar:nth-child(5){animation-delay:.55s}
+.premium-chart-bar:nth-child(6){animation-delay:.65s}
+.premium-chart-bar:nth-child(7){animation-delay:.75s}
+
+.premium-chart-labels{
+    display:flex;
+    justify-content:space-between;
+
+    margin-top:9px;
+
+    font-size:8px;
+    color:#777;
+}
+
+@keyframes premiumAppear{
+    from{
+        opacity:0;
+        transform:translateY(20px) scale(.98);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+@keyframes premiumShine{
+    0%,55%{
+        left:-55%;
+    }
+    100%{
+        left:130%;
+    }
+}
+
+@keyframes premiumGlow{
+    0%,100%{
+        opacity:.55;
+    }
+    50%{
+        opacity:1;
+    }
+}
+
+@keyframes crownFloat{
+    0%,100%{
+        transform:translateY(0) rotate(0deg);
+    }
+    50%{
+        transform:translateY(-5px) rotate(-2deg);
+    }
+}
+
+@keyframes badgeShine{
+    0%{
+        left:-80%;
+    }
+    55%,100%{
+        left:140%;
+    }
+}
+
+@keyframes statusPulse{
+    0%,100%{
+        transform:scale(1);
+        opacity:1;
+    }
+    50%{
+        transform:scale(1.35);
+        opacity:.65;
+    }
+}
+
+@keyframes premiumCardIn{
+    from{
+        opacity:0;
+        transform:translateY(12px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes chartGrow{
+    from{
+        height:0;
+    }
+    to{
+        height:var(--bar-height);
+    }
+}
+
+@media(max-width:650px){
+
+    #premiumDashboard{
+        padding:18px;
+        border-radius:20px;
+    }
+
+    .premium-kpis{
+        grid-template-columns:1fr;
+    }
+
+    .premium-top{
+        align-items:flex-start;
+    }
+
+    .premium-gold-badge{
+        font-size:8px;
+        padding:7px 9px;
+    }
+
+}
+
+
+/* =====================================================
+   NEXORA PREMIUM DASHBOARD — LUXURY GOLD
+===================================================== */
+
+.premium-dashboard{
+    position:relative;
+    overflow:hidden;
+    margin:22px 0;
+    padding:24px;
+    border-radius:24px;
+    background:
+        radial-gradient(circle at 90% 0%,rgba(246,211,101,.16),transparent 35%),
+        linear-gradient(145deg,#090d16,#111827 55%,#0b0f18);
+    border:1px solid rgba(246,211,101,.42);
+    box-shadow:
+        0 0 0 1px rgba(246,211,101,.08),
+        0 20px 55px rgba(0,0,0,.18),
+        0 0 45px rgba(246,211,101,.08);
+    animation:premiumDashboardIn .8s ease both;
+}
+
+.premium-dashboard-glow{
+    position:absolute;
+    width:260px;
+    height:260px;
+    right:-100px;
+    top:-130px;
+    border-radius:50%;
+    background:rgba(246,211,101,.16);
+    filter:blur(35px);
+    animation:premiumGlowMove 5s ease-in-out infinite;
+}
+
+.premium-dashboard-head{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.premium-dashboard-label{
+    color:#f6d365;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:2px;
+    margin-bottom:7px;
+}
+
+.premium-dashboard-head h2{
+    color:#fff;
+    font-size:21px;
+    margin:0;
+}
+
+.premium-dashboard-head p{
+    color:#9ca8ba;
+    font-size:11px;
+    margin:7px 0 0;
+}
+
+.premium-active-badge{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 11px;
+    border-radius:999px;
+    color:#f6d365;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.7px;
+    background:rgba(246,211,101,.08);
+    border:1px solid rgba(246,211,101,.3);
+    box-shadow:0 0 18px rgba(246,211,101,.12);
+    white-space:nowrap;
+}
+
+.premium-active-badge span{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#f6d365;
+    box-shadow:0 0 10px #f6d365;
+    animation:premiumPulse 1.7s infinite;
+}
+
+.premium-stats{
+    position:relative;
+    z-index:2;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-top:20px;
+}
+
+.premium-stat{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px;
+    border-radius:15px;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.08);
+    transition:.3s;
+}
+
+.premium-stat:hover{
+    transform:translateY(-3px);
+    border-color:rgba(246,211,101,.35);
+}
+
+.premium-stat-icon{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#f6d365;
+    font-size:18px;
+    background:rgba(246,211,101,.1);
+}
+
+.premium-stat small{
+    display:block;
+    color:#7f8b9e;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.premium-stat strong{
+    display:block;
+    color:#fff;
+    font-size:12px;
+    margin-top:4px;
+}
+
+.premium-chart-card{
+    position:relative;
+    z-index:2;
+    margin-top:14px;
+    padding:17px;
+    border-radius:18px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.premium-chart-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.premium-chart-head small{
+    color:#7f8b9e;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.premium-chart-head h3{
+    color:#fff;
+    font-size:14px;
+    margin:5px 0 0;
+}
+
+.premium-chart-period{
+    color:#f6d365;
+    font-size:8px;
+    font-weight:900;
+    padding:6px 8px;
+    border-radius:7px;
+    background:rgba(246,211,101,.08);
+}
+
+.premium-chart{
+    height:190px;
+    margin-top:12px;
+    position:relative;
+    overflow:hidden;
+}
+
+.chart-grid{
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:100% 38px,60px 100%;
+}
+
+.premium-chart-svg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:visible;
+}
+
+.premium-chart-area{
+    fill:url(#premiumAreaGradient);
+    animation:premiumAreaReveal 1.8s ease both;
+}
+
+.premium-chart-line{
+    fill:none;
+    stroke:#f6d365;
+    stroke-width:3;
+    stroke-linecap:round;
+    filter:drop-shadow(0 0 7px rgba(246,211,101,.55));
+    stroke-dasharray:1000;
+    stroke-dashoffset:1000;
+    animation:premiumChartDraw 2.2s ease forwards;
+}
+
+.premium-chart-labels{
+    display:flex;
+    justify-content:space-between;
+    color:#687487;
+    font-size:8px;
+    margin-top:5px;
+}
+
+.premium-benefits{
+    position:relative;
+    z-index:2;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:13px;
+}
+
+.premium-benefit{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px;
+    border-radius:14px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.07);
+    transition:.3s;
+}
+
+.premium-benefit:hover{
+    transform:translateY(-3px);
+    border-color:rgba(246,211,101,.35);
+}
+
+.benefit-icon{
+    width:32px;
+    height:32px;
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:9px;
+    color:#f6d365;
+    background:rgba(246,211,101,.09);
+    font-size:16px;
+}
+
+.premium-benefit strong{
+    display:block;
+    color:#fff;
+    font-size:10.5px;
+}
+
+.premium-benefit span{
+    display:block;
+    color:#7f8b9e;
+    font-size:8.5px;
+    margin-top:3px;
+}
+
+.premium-renewal{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    margin-top:14px;
+    padding:12px;
+    border-radius:14px;
+    background:linear-gradient(90deg,rgba(246,211,101,.09),rgba(255,255,255,.025));
+    border:1px solid rgba(246,211,101,.18);
+}
+
+.renewal-icon{
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    color:#f6d365;
+    background:rgba(246,211,101,.1);
+    font-size:18px;
+    animation:premiumRotate 4s linear infinite;
+}
+
+.premium-renewal small{
+    display:block;
+    color:#7f8b9e;
+    font-size:7px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.premium-renewal strong{
+    display:block;
+    color:#fff;
+    font-size:10px;
+    margin-top:3px;
+}
+
+.renewal-status{
+    margin-left:auto;
+    color:#f6d365;
+    font-size:8px;
+    font-weight:900;
+}
+
+@keyframes premiumDashboardIn{
+    from{
+        opacity:0;
+        transform:translateY(25px) scale(.98);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+@keyframes premiumGlowMove{
+    0%,100%{
+        transform:translate(0,0);
+    }
+    50%{
+        transform:translate(-35px,35px);
+    }
+}
+
+@keyframes premiumPulse{
+    0%,100%{
+        transform:scale(1);
+        opacity:1;
+    }
+    50%{
+        transform:scale(1.6);
+        opacity:.5;
+    }
+}
+
+@keyframes premiumChartDraw{
+    to{
+        stroke-dashoffset:0;
+    }
+}
+
+@keyframes premiumAreaReveal{
+    from{
+        opacity:0;
+    }
+    to{
+        opacity:1;
+    }
+}
+
+@keyframes premiumRotate{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@media(max-width:600px){
+
+    .premium-dashboard{
+        padding:18px;
+        border-radius:20px;
+    }
+
+    .premium-dashboard-head{
+        flex-direction:column;
+    }
+
+    .premium-stats{
+        grid-template-columns:1fr;
+    }
+
+    .premium-benefits{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     ACCUEIL
+===================================================== -->
+
+<section id="homeScreen" class="screen active">
+
+<div class="home">
+
+<header class="home-header">
+
+<div class="logo">
+
+<div class="logo-mark">N</div>
+
+<div>
+<div class="logo-name">NEXORA</div>
+<div class="logo-sub">PRIVATE FINANCIAL NETWORK</div>
+</div>
+
+</div>
+
+<button class="home-login" onclick="showLogin()">
+Se connecter
+</button>
+
+</header>
+
+<div class="home-content">
+
+<div>
+
+<div class="home-eyebrow">
+VOTRE ESPACE FINANCIER PRIVÉ
+</div>
+
+<h1>
+Gérez votre argent avec
+<span>clarté.</span>
+</h1>
+
+<p class="home-text">
+NEXORA réunit vos opérations financières dans un espace
+moderne, sécurisé et conçu pour vous permettre de suivre
+vos transactions et vos notifications en toute simplicité.
+</p>
+
+<div class="home-buttons">
+
+<button class="btn-primary" onclick="showRegister()">
+Créer mon compte
+</button>
+
+<button class="btn-outline" onclick="showLogin()">
+J'ai déjà un compte
+</button>
+
+</div>
+
+<div class="home-features">
+
+<div class="feature">
+<strong>Transactions</strong>
+<span>Suivez vos opérations</span>
+</div>
+
+<div class="feature">
+<strong>Notifications</strong>
+<span>Recevez vos alertes</span>
+</div>
+
+<div class="feature">
+<strong>Sécurité</strong>
+<span>Protection de votre espace</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="phone-card">
+
+<div class="phone-inner">
+
+<div class="phone-top">
+
+<span>NEXORA</span>
+<span>10:42</span>
+
+</div>
+
+<div class="phone-balance">
+
+<small>SOLDE DISPONIBLE</small>
+
+<strong>245 000</strong>
+
+<small>FCFA</small>
+
+</div>
+
+<div class="phone-row">
+
+<div class="phone-action">
+↑ Envoyer
+</div>
+
+<div class="phone-action">
+↓ Recevoir
+</div>
+
+</div>
+
+<div style="margin-top:28px;font-size:9px;color:#7d8796">
+DERNIÈRE ACTIVITÉ
+</div>
+
+<div style="margin-top:12px;padding:12px;border:1px solid #edf0f4;border-radius:12px;font-size:9px">
+<strong style="display:block">Paiement reçu</strong>
+<span style="color:#929aa8">+75 000 FCFA · Aujourd'hui</span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     CONNEXION
+===================================================== -->
+
+<section id="loginScreen" class="screen">
+
+<div class="auth">
+
+<div class="auth-side" onclick="showHome()">
+
+<div>
+
+<div class="logo">
+
+<div class="logo-mark">N</div>
+
+<div>
+<div class="logo-name">NEXORA</div>
+<div class="logo-sub">PRIVATE FINANCIAL NETWORK</div>
+</div>
+
+</div>
+
+<h1>
+Bienvenue<br>
+dans votre<br>
+espace.
+</h1>
+
+<p>
+Connectez-vous pour accéder à vos informations,
+suivre vos opérations et gérer vos bénéficiaires.
+</p>
+
+</div>
+
+<div class="security">
+<i></i>
+Connexion protégée
+</div>
+
+</div>
+
+<div class="auth-main">
+
+<div class="auth-box">
+
+<button class="back" onclick="showHome()">
+← Retour à l'accueil
+</button>
+
+<div class="auth-label">
+ACCÈS SÉCURISÉ
+</div>
+
+<h2>Se connecter</h2>
+
+<p>
+Accédez à votre espace financier NEXORA.
+</p>
+
+<form class="auth-form" onsubmit="login(event)">
+
+<label class="field-label">
+ADRESSE GMAIL
+</label>
+
+<input
+class="input"
+id="loginEmail"
+type="email"
+autocomplete="username"
+placeholder="exemple@gmail.com"
+required
+>
+
+<label class="field-label">
+MOT DE PASSE
+</label>
+
+<input
+class="input"
+id="loginPassword"
+type="password"
+autocomplete="current-password"
+placeholder="Votre mot de passe"
+required
+>
+
+<button class="auth-submit" type="submit">
+Accéder à mon espace
+</button>
+
+</form>
+
+<div class="switch">
+Vous n'avez pas encore de compte ?
+<button onclick="showRegister()">Créer un compte</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     INSCRIPTION
+===================================================== -->
+
+<section id="registerScreen" class="screen">
+
+<div class="auth">
+
+<div class="auth-side" onclick="showHome()">
+
+<div>
+
+<div class="logo">
+
+<div class="logo-mark">N</div>
+
+<div>
+<div class="logo-name">NEXORA</div>
+<div class="logo-sub">PRIVATE FINANCIAL NETWORK</div>
+</div>
+
+</div>
+
+<h1>
+Créez votre<br>
+espace<br>
+personnel.
+</h1>
+
+<p>
+Quelques informations suffisent pour commencer.
+Votre compte sera ensuite associé à votre numéro
+de téléphone.
+</p>
+
+</div>
+
+<div class="security">
+<i></i>
+Vos informations restent protégées
+</div>
+
+</div>
+
+<div class="auth-main">
+
+<div class="auth-box">
+
+<button class="back" onclick="showHome()">
+← Retour à l'accueil
+</button>
+
+<div class="auth-label">
+NOUVEAU CLIENT
+</div>
+
+<h2>Créer un compte</h2>
+
+<p>
+Renseignez vos informations personnelles.
+</p>
+
+<form class="auth-form" onsubmit="register(event)">
+
+<div class="form-two">
+
+<div>
+
+<label class="field-label">
+NOM
+</label>
+
+<input
+class="input"
+id="lastName"
+placeholder="Votre nom"
+required
+>
+
+</div>
+
+<div>
+
+<label class="field-label">
+PRÉNOM
+</label>
+
+<input
+class="input"
+id="firstName"
+placeholder="Votre prénom"
+required
+>
+
+</div>
+
+</div>
+
+<label class="field-label">
+ADRESSE GMAIL
+</label>
+
+<input
+class="input"
+id="registerEmail"
+type="email"
+autocomplete="email"
+placeholder="exemple@gmail.com"
+required
+>
+
+<label class="field-label">
+PAYS DE RÉSIDENCE
+</label>
+
+<select
+class="input"
+id="registerCountry"
+onchange="updateCountryFields()"
+required
+>
+<option value="">Sélectionnez votre pays</option>
+<option value="BJ" data-code="+229" data-bank="RIB">🇧🇯 Bénin</option>
+<option value="CI" data-code="+225" data-bank="RIB">🇨🇮 Côte d’Ivoire</option>
+<option value="SN" data-code="+221" data-bank="RIB">🇸🇳 Sénégal</option>
+<option value="TG" data-code="+228" data-bank="RIB">🇹🇬 Togo</option>
+<option value="GH" data-code="+233" data-bank="IBAN">🇬🇭 Ghana</option>
+<option value="NG" data-code="+234" data-bank="Account Number">🇳🇬 Nigeria</option>
+<option value="CM" data-code="+237" data-bank="RIB">🇨🇲 Cameroun</option>
+<option value="GA" data-code="+241" data-bank="RIB">🇬🇦 Gabon</option>
+<option value="CD" data-code="+243" data-bank="RIB">🇨🇩 RD Congo</option>
+<option value="CG" data-code="+242" data-bank="RIB">🇨🇬 Congo</option>
+<option value="FR" data-code="+33" data-bank="IBAN">🇫🇷 France</option>
+<option value="BE" data-code="+32" data-bank="IBAN">🇧🇪 Belgique</option>
+<option value="CH" data-code="+41" data-bank="IBAN">🇨🇭 Suisse</option>
+<option value="DE" data-code="+49" data-bank="IBAN">🇩🇪 Allemagne</option>
+<option value="ES" data-code="+34" data-bank="IBAN">🇪🇸 Espagne</option>
+<option value="IT" data-code="+39" data-bank="IBAN">🇮🇹 Italie</option>
+<option value="PT" data-code="+351" data-bank="IBAN">🇵🇹 Portugal</option>
+<option value="NL" data-code="+31" data-bank="IBAN">🇳🇱 Pays-Bas</option>
+<option value="GB" data-code="+44" data-bank="Sort Code + Account Number">🇬🇧 Royaume-Uni</option>
+<option value="US" data-code="+1" data-bank="Routing Number + Account Number">🇺🇸 États-Unis</option>
+<option value="CA" data-code="+1" data-bank="Transit + Institution + Account">🇨🇦 Canada</option>
+<option value="AE" data-code="+971" data-bank="IBAN">🇦🇪 Émirats arabes unis</option>
+<option value="MA" data-code="+212" data-bank="RIB">🇲🇦 Maroc</option>
+<option value="DZ" data-code="+213" data-bank="RIB">🇩🇿 Algérie</option>
+<option value="TN" data-code="+216" data-bank="RIB">🇹🇳 Tunisie</option>
+<option value="ZA" data-code="+27" data-bank="Account Number">🇿🇦 Afrique du Sud</option>
+<option value="IN" data-code="+91" data-bank="Account Number + IFSC">🇮🇳 Inde</option>
+<option value="BR" data-code="+55" data-bank="Account Number">🇧🇷 Brésil</option>
+<option value="AU" data-code="+61" data-bank="BSB + Account Number">🇦🇺 Australie</option>
+<option value="JP" data-code="+81" data-bank="Account Number">🇯🇵 Japon</option>
+</select>
+
+<label class="field-label">
+NUMÉRO DE TÉLÉPHONE
+</label>
+
+<div style="display:grid;grid-template-columns:105px 1fr;gap:8px">
+
+<input
+class="input"
+id="phoneCode"
+readonly
+placeholder="+229"
+>
+
+<input
+class="input"
+id="registerPhone"
+type="tel"
+inputmode="tel"
+placeholder="Numéro de téléphone"
+required
+>
+
+</div>
+
+<label class="field-label" id="bankLabel">
+IDENTIFIANT BANCAIRE
+</label>
+
+<input
+class="input"
+id="bankIdentifier"
+placeholder="Sélectionnez d'abord votre pays"
+required
+>
+
+<label class="field-label">
+DATE DE NAISSANCE
+</label>
+
+<input
+class="input"
+type="date"
+required
+>
+
+
+
+<div class="form-two">
+
+<div>
+
+<label class="field-label">
+MOT DE PASSE
+</label>
+
+<input
+class="input"
+type="password"
+required
+>
+
+</div>
+
+<div>
+
+<label class="field-label">
+CONFIRMATION
+</label>
+
+<input
+class="input"
+type="password"
+required
+>
+
+</div>
+
+</div>
+
+<label class="checkbox">
+
+<input type="checkbox" required>
+
+<span>
+J'accepte les conditions d'utilisation et la politique
+de confidentialité de NEXORA.
+</span>
+
+</label>
+
+<button class="auth-submit">
+Créer mon compte
+</button>
+
+</form>
+
+<div class="switch">
+Vous avez déjà un compte ?
+<button onclick="showLogin()">Se connecter</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     VERIFICATION
+===================================================== -->
+
+<section id="verificationScreen" class="screen">
+
+<div class="auth">
+
+<div class="auth-side">
+
+<div>
+
+<div class="logo">
+
+<div class="logo-mark">N</div>
+
+<div>
+<div class="logo-name">NEXORA</div>
+<div class="logo-sub">PRIVATE FINANCIAL NETWORK</div>
+</div>
+
+</div>
+
+<h1>
+Une dernière<br>
+étape.
+</h1>
+
+<p>
+Nous devons vérifier votre adresse Gmail
+avant de finaliser la création de votre espace.
+</p>
+
+</div>
+
+<div class="security">
+<i></i>
+Vérification sécurisée
+</div>
+
+</div>
+
+<div class="auth-main">
+
+<div class="auth-box">
+
+<div class="auth-label">
+VÉRIFICATION DU COMPTE
+</div>
+
+<h2>Confirmez votre adresse Gmail</h2>
+
+<p>
+Un code de vérification sera envoyé sur :
+<br>
+<strong id="verificationEmail">votre@gmail.com</strong>
+</p>
+
+<form class="auth-form" onsubmit="verify(event)">
+
+<label class="field-label">
+CODE DE VÉRIFICATION
+</label>
+
+<input
+class="input"
+id="verificationCode"
+inputmode="numeric"
+maxlength="6"
+placeholder="000000"
+required
+>
+
+<button class="auth-submit">
+Vérifier mon compte
+</button>
+
+</form>
+
+<div class="switch">
+Vous n'avez pas reçu le code ?
+<button type="button" onclick="resendCode()">
+Renvoyer
+</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     TABLEAU DE BORD
+===================================================== -->
+
+<section id="dashboardScreen" class="screen">
+
+<header class="dashboard-header">
+
+<div class="dash-brand">
+
+<div class="dash-mark">N</div>
+
+<div>
+<div class="dash-name">NEXORA</div>
+<div class="dash-sub">PRIVATE FINANCIAL NETWORK</div>
+</div>
+
+</div>
+
+<div class="header-right">
+
+<button class="bell" onclick="notify()">
+♧
+<i class="bell-dot"></i>
+</button>
+
+<div class="profile">
+
+<div class="avatar" id="dashAvatar">
+GM
+</div>
+
+<div>
+<div class="profile-name" id="dashName">
+Georges Mervédi
+</div>
+
+<div class="profile-type">
+Compte personnel
+</div>
+</div>
+
+<div class="account-menu">
+
+<button
+    class="account-menu-btn"
+    onclick="toggleAccountMenu(event)"
+    title="Menu du compte"
+>
+    ⋮
+</button>
+
+<div class="account-dropdown" id="accountDropdown">
+
+<button class="menu-item" onclick="closeAccountMenu(); logout();">
+⇥ <span>Se déconnecter</span>
+</button>
+
+<div class="menu-sep"></div>
+
+<button class="menu-item danger" onclick="closeAccountMenu(); openDeleteAccountModal();">
+🗑 <span>Supprimer le compte définitivement</span>
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</header>
+
+<main class="main">
+
+<section class="greeting">
+
+<div class="greeting-small">
+ESPACE FINANCIER
+</div>
+
+<h1 id="greetingName">
+Bonjour Georges.
+</h1>
+
+<p>
+Voici un aperçu de votre activité financière.
+</p>
+
+</section>
+
+<section class="balance-card">
+
+<div class="balance-top">
+
+<div>
+
+<div class="balance-label">
+SOLDE DISPONIBLE
+</div>
+
+<div class="balance-number">
+
+<span id="balanceAmount">245 000</span>
+
+<small id="balanceCurrency">EUR</small>
+
+</div>
+
+</div>
+
+<div class="secure">
+<i></i>
+Compte sécurisé
+</div>
+
+</div>
+
+<div class="balance-bottom">
+
+<div class="balance-meta">
+
+<span>TITULAIRE</span>
+
+<strong id="holderName">
+GEORGES MERVÉDI
+</strong>
+
+</div>
+
+<div class="balance-meta">
+
+<span>COMPTE</span>
+
+<strong>•••• 4582</strong>
+
+</div>
+
+</div>
+
+</section>
+
+<div style="display:flex;justify-content:flex-end;margin-top:14px;">
+<button id="btnPremium" onclick="openPremiumModal()" style="border:1px solid var(--gold);background:linear-gradient(135deg,#3272ed,#1d4ed8);color:white;padding:14px 22px;border-radius:11px;font-size:11px;font-weight:800;box-shadow:0 0 0 1px rgba(212,175,55,.35),0 10px 23px rgba(212,175,55,.25);">
+En savoir plus sur Premium
+</button>
+</div>
+
+
+<!-- =====================================================
+     DASHBOARD PREMIUM
+===================================================== -->
+
+<section id="premiumDashboard" class="premium-dashboard" style="display:none;">
+
+    <div class="premium-dashboard-glow"></div>
+
+    <div class="premium-dashboard-head">
+
+        <div>
+            <div class="premium-dashboard-label">
+                ✦ NEXORA PREMIUM
+            </div>
+
+            <h2>
+                Votre espace financier exclusif
+            </h2>
+
+            <p>
+                Profitez de toutes les fonctionnalités Premium.
+            </p>
+        </div>
+
+        <div class="premium-active-badge">
+            <span></span>
+            PREMIUM ACTIF
+        </div>
+
+    </div>
+
+
+    <div class="premium-stats">
+
+        <div class="premium-stat">
+            <div class="premium-stat-icon">↗</div>
+
+            <div>
+                <small>ENTRÉES</small>
+                <strong id="premiumEntrees">0 FCFA</strong>
+            </div>
+        </div>
+
+
+        <div class="premium-stat">
+            <div class="premium-stat-icon">↘</div>
+
+            <div>
+                <small>SORTIES</small>
+                <strong id="premiumSorties">0 FCFA</strong>
+            </div>
+        </div>
+
+
+        <div class="premium-stat">
+            <div class="premium-stat-icon">∞</div>
+
+            <div>
+                <small>PLAFOND</small>
+                <strong>ILLIMITÉ</strong>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="premium-chart-card">
+
+        <div class="premium-chart-head">
+
+            <div>
+                <small>ACTIVITÉ FINANCIÈRE</small>
+                <h3>Évolution du compte</h3>
+            </div>
+
+            <div class="premium-chart-period">
+                30 JOURS
+            </div>
+
+        </div>
+
+
+        <div class="premium-chart">
+
+            <div class="chart-grid"></div>
+
+            <svg viewBox="0 0 600 190"
+                 preserveAspectRatio="none"
+                 class="premium-chart-svg">
+
+                <defs>
+
+                    <linearGradient
+                        id="premiumAreaGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1">
+
+                        <stop offset="0%"
+                              stop-color="#f6d365"
+                              stop-opacity=".45"/>
+
+                        <stop offset="100%"
+                              stop-color="#f6d365"
+                              stop-opacity="0"/>
+
+                    </linearGradient>
+
+                </defs>
+
+                <path
+                    class="premium-chart-area"
+                    d="M0 150
+                       C40 142 55 120 90 128
+                       C125 136 145 92 180 104
+                       C215 116 235 74 270 86
+                       C305 98 330 55 365 70
+                       C400 85 420 48 455 57
+                       C490 66 520 30 550 42
+                       C570 50 585 32 600 20
+                       L600 190
+                       L0 190 Z"/>
+
+                <path
+                    class="premium-chart-line"
+                    d="M0 150
+                       C40 142 55 120 90 128
+                       C125 136 145 92 180 104
+                       C215 116 235 74 270 86
+                       C305 98 330 55 365 70
+                       C400 85 420 48 455 57
+                       C490 66 520 30 550 42
+                       C570 50 585 32 600 20"/>
+
+            </svg>
+
+        </div>
+
+        <div class="premium-chart-labels">
+            <span>J-30</span>
+            <span>J-20</span>
+            <span>J-10</span>
+            <span>Aujourd'hui</span>
+        </div>
+
+    </div>
+
+
+    <div class="premium-benefits">
+
+        <div class="premium-benefit">
+            <div class="benefit-icon">♛</div>
+
+            <div>
+                <strong>Badge Premium</strong>
+                <span>Compte certifié Premium</span>
+            </div>
+        </div>
+
+
+        <div class="premium-benefit">
+            <div class="benefit-icon">∞</div>
+
+            <div>
+                <strong>Solde illimité</strong>
+                <span>Renouvellement automatique</span>
+            </div>
+        </div>
+
+
+        <div class="premium-benefit">
+            <div class="benefit-icon">⚡</div>
+
+            <div>
+                <strong>Transferts prioritaires</strong>
+                <span>Traitement prioritaire</span>
+            </div>
+        </div>
+
+
+        <div class="premium-benefit">
+            <div class="benefit-icon">◈</div>
+
+            <div>
+                <strong>Historique Premium</strong>
+                <span>Accès complet aux opérations</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="premium-renewal">
+
+        <div class="renewal-icon">
+            ↻
+        </div>
+
+        <div>
+            <small>ABONNEMENT PREMIUM</small>
+            <strong id="premiumExpiration">
+                Actif
+            </strong>
+        </div>
+
+        <div class="renewal-status">
+            ● ACTIF
+        </div>
+
+    </div>
+
+</section>
+
+<section class="actions">
+
+<button class="action primary" onclick="openModal()">
+
+<div class="action-icon">↑</div>
+
+<div class="action-text">
+
+<strong>
+Envoyer de l'argent
+</strong>
+
+<span>
+Vers un bénéficiaire
+</span>
+
+</div>
+
+<div>→</div>
+
+</button>
+
+<button class="action">
+
+<div class="action-icon">↓</div>
+
+<div class="action-text">
+
+<strong>Recevoir</strong>
+
+<span>Demander un paiement</span>
+
+</div>
+
+</button>
+
+<button class="action">
+
+<div class="action-icon">+</div>
+
+<div class="action-text">
+
+<strong>Bénéficiaires</strong>
+
+<span>Contacts enregistrés</span>
+
+</div>
+
+</button>
+
+</section>
+
+<section class="grid">
+
+<div class="panel">
+
+<div class="panel-head">
+
+<div>
+
+<small>ACTIVITÉ</small>
+
+<h2>Transactions récentes</h2>
+
+</div>
+
+<button>Voir tout</button>
+
+</div>
+
+<div id="recentTransactionsList">
+<p class="tx-empty" style="color:#7c8798;padding:12px 0">Aucune transaction pour l'instant.</p>
+</div>
+
+</div>
+
+<div class="panel">
+
+<div class="panel-head">
+
+<div>
+
+<small>CENTRE D'ALERTES</small>
+
+<h2>Notifications</h2>
+
+</div>
+
+</div>
+
+<div class="notification" id="notificationsList">
+<p class="tx-empty" style="color:#7c8798;padding:12px 0">Aucune notification pour l'instant.</p>
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</section>
+
+
+<!-- =====================================================
+     MODAL TRANSFERT
+===================================================== -->
+
+<div class="overlay" id="overlay" onclick="outside(event)">
+
+<div class="modal">
+
+<div id="formArea">
+
+<div class="modal-header">
+
+<div>
+
+<div class="modal-label">
+NOUVELLE OPÉRATION
+</div>
+
+<h2>Envoyer de l'argent</h2>
+
+<p>
+Transférez un montant à un bénéficiaire.
+</p>
+
+</div>
+
+<button class="close" onclick="closeModal()">×</button>
+
+</div>
+
+<form class="form" onsubmit="send(event)">
+
+<label class="form-label">
+TYPE D'OPÉRATION
+</label>
+
+<div class="field">
+<select id="operationType" onchange="updateLabels()">
+<option value="envoyer">Envoyer de l'argent</option>
+<option value="recevoir">Recevoir de l'argent</option>
+</select>
+</div>
+
+<label class="form-label" id="nameLabel">
+NOM DU DESTINATAIRE
+</label>
+
+<div class="field">
+<input id="recipientName" type="text" placeholder="Ex. Jean Dupont" required>
+</div>
+
+<label class="form-label">
+TÉLÉPHONE
+</label>
+
+<div class="field">
+<input id="recipientPhone" type="tel" placeholder="Ex. +33 6 12 34 56 78" required>
+</div>
+
+<label class="form-label">
+EMAIL DU DESTINATAIRE
+</label>
+
+<div class="field">
+<input id="recipientEmail" type="email" placeholder="Ex. jean@example.com" required>
+</div>
+
+<label class="form-label">
+IDENTIFIANT FINANCIER (RIB / IBAN)
+</label>
+
+<div class="field">
+<input id="recipientIban" type="text" placeholder="Ex. FR76 3000 6000 0112 3456 7890 189" required>
+</div>
+
+<label class="form-label">
+MONTANT
+</label>
+
+<div class="field amount">
+<input id="amount" type="number" min="1" placeholder="0" required oninput="calculate()">
+</div>
+
+<label class="form-label">
+DEVISE
+</label>
+
+<div class="field">
+<select id="currency">
+<option value="EUR">Euro (EUR)</option>
+<option value="FCFA">FCFA</option>
+<option value="USD">Dollar US (USD)</option>
+<option value="GBP">Livre sterling (GBP)</option>
+<option value="CAD">Dollar canadien (CAD)</option>
+<option value="CHF">Franc suisse (CHF)</option>
+<option value="MAD">Dirham marocain (MAD)</option>
+<option value="NGN">Naira nigérian (NGN)</option>
+</select>
+</div>
+
+<div class="two">
+
+<div>
+
+<label class="form-label">
+MOTIF
+</label>
+
+<div class="field">
+
+<input
+id="reason"
+placeholder="Ex. Paiement"
+required
+>
+
+</div>
+
+</div>
+
+<div>
+
+<label class="form-label">
+TYPE
+</label>
+
+<div class="field">
+
+<select id="type">
+
+<option>Transfert</option>
+<option>Paiement</option>
+<option>Remboursement</option>
+
+</select>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="summary">
+
+<div class="summary-row">
+<span>Destinataire</span>
+<strong id="summaryRecipient">-</strong>
+</div>
+
+<div class="summary-row">
+<span>Solde disponible</span>
+<strong id="summaryBalance">0</strong>
+</div>
+
+<div class="summary-row">
+<span>Montant</span>
+<strong id="sum">0</strong>
+</div>
+
+<div class="summary-row">
+<span>Frais</span>
+<strong id="summaryFees">0</strong>
+</div>
+
+<div class="summary-row summary-total">
+<span>Total</span>
+<strong id="total">0</strong>
+</div>
+
+</div>
+
+<button class="send">
+Vérifier et envoyer
+</button>
+
+</form>
+
+</div>
+
+<div class="success" id="success">
+
+<div class="success-mark">✓</div>
+
+<h2>Transaction enregistrée</h2>
+
+<p>
+L'opération a été enregistrée.
+<br>
+Le destinataire sera notifié sur son téléphone.
+</p>
+
+<div class="ref">
+
+<span>RÉFÉRENCE</span>
+
+<strong id="reference">
+NXR-00000000
+</strong>
+
+</div>
+
+<button class="done" onclick="shareReceipt()" style="margin-bottom:8px">
+Partager le reçu
+</button>
+
+<button class="done" onclick="downloadReceiptImage()" style="margin-bottom:8px;background:#eef1f7;color:#0b1b3a">
+Télécharger le reçu
+</button>
+
+<button class="done" onclick="closeModal()">
+Fermer
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div id="transactionDetailModal" style="display:none;position:fixed;inset:0;background:rgba(11,27,58,0.45);z-index:999;align-items:center;justify-content:center;">
+<div style="background:#fff;border-radius:16px;max-width:420px;width:92%;padding:28px;position:relative;max-height:85vh;overflow:auto;">
+
+<button onclick="closeTransactionDetail()" style="position:absolute;top:16px;right:16px;background:#f1f3f8;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;">✕</button>
+
+<div style="text-align:center;margin-top:12px">
+<div id="detailIcon" style="width:48px;height:48px;border-radius:12px;background:#eef1f7;display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px"></div>
+<div id="detailAmount" style="font-size:30px;font-weight:800;color:#0b1b3a"></div>
+<div id="detailTitle" style="font-size:16px;color:#0b1b3a;margin-top:8px;font-weight:600"></div>
+<div id="detailDate" style="font-size:13px;color:#7c8798;margin-top:4px"></div>
+</div>
+
+<div style="background:#f8f9fc;border:1px solid #e2e6ee;border-radius:12px;padding:16px;margin-top:24px">
+<div style="font-size:12px;color:#7c8798">STATUT</div>
+<div style="font-weight:700;color:#1f8a4c;margin-bottom:14px">Validé</div>
+<div style="font-size:12px;color:#7c8798">PRISE EN COMPTE</div>
+<div id="detailPriseEnCompte" style="font-weight:700;color:#0b1b3a"></div>
+</div>
+
+<div style="background:#f8f9fc;border:1px solid #e2e6ee;border-radius:12px;padding:16px;margin-top:16px">
+<div style="font-size:12px;color:#7c8798">OPÉRATION</div>
+<div style="font-weight:700;color:#0b1b3a;margin-bottom:14px">Virement instantané</div>
+<div style="font-size:12px;color:#7c8798">MOTIF</div>
+<div id="detailMotif" style="font-weight:700;color:#0b1b3a;margin-bottom:14px"></div>
+<div style="font-size:12px;color:#7c8798">RÉFÉRENCE</div>
+<div id="detailReference" style="font-weight:700;color:#0b1b3a"></div>
+</div>
+
+<button onclick="shareReceipt(currentDetailTransaction)" style="width:100%;margin-top:16px;padding:14px;border:none;border-radius:10px;background:#0b1b3a;color:#fff;font-weight:600;cursor:pointer">
+Partager le reçu
+</button>
+
+<button onclick="downloadReceiptImage(currentDetailTransaction)" style="width:100%;margin-top:10px;padding:14px;border:none;border-radius:10px;background:#eef1f7;color:#0b1b3a;font-weight:600;cursor:pointer">
+Télécharger le reçu
+</button>
+
+</div>
+</div>
+
+<!-- =====================================================
+     MODAL PREMIUM
+===================================================== -->
+
+<div class="overlay" id="overlayPremium" onclick="outsidePremium(event)">
+
+<div class="modal">
+
+<div style="position:relative;background:linear-gradient(145deg,#07111f,#132a4e);border-radius:25px 25px 0 0;padding:32px 28px 26px;overflow:hidden;">
+
+<div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,.35),transparent 70%);"></div>
+
+<button class="close" onclick="closePremiumModal()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,.12);color:white;">×</button>
+
+<div class="premium-icon" style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#3272ed,#1d4ed8);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 23px rgba(37,99,235,.35);">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 8L6.5 11L12 4L17.5 11L22 8L20 18H4L2 8Z" fill="#ffd35c" stroke="#ffd35c" stroke-width="1.2" stroke-linejoin="round"/>
+</svg>
+</div>
+
+<div style="color:#78a5ff;font-size:10px;font-weight:800;letter-spacing:1.5px;margin-top:16px;">NEXORA PREMIUM</div>
+
+<h2 style="color:white;font-size:22px;margin-top:6px;line-height:1.3;">Débloquez tout le potentiel de votre compte</h2>
+
+<div style="display:flex;align-items:baseline;gap:6px;margin-top:16px;">
+<span style="color:white;font-size:34px;font-weight:800;">2 400 FCFA</span>
+<span style="color:#9aaac1;font-size:12px;font-weight:600;">/ mois</span>
+</div>
+
+<div style="color:#9aaac1;font-size:11px;margin-top:6px;">Sans engagement — résiliable à tout moment</div>
+
+</div>
+
+<div class="form" style="padding-top:24px;">
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+
+<div class="premium-card" style="background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:14px;">
+<div style="width:32px;height:32px;border-radius:9px;background:var(--blueSoft);display:flex;align-items:center;justify-content:center;">
+<svg class="icon-spark" width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L14.2 8.2L20.5 9.3L15.8 13.6L17.1 20L12 16.6L6.9 20L8.2 13.6L3.5 9.3L9.8 8.2L12 2Z" fill="var(--blue)"/>
+</svg>
+</div>
+<div style="font-size:12px;font-weight:700;color:var(--text);margin-top:10px;">Badge Premium</div>
+<div style="font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.5;">Visible sur votre profil</div>
+</div>
+
+<div class="premium-card" style="background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:14px;">
+<div style="width:32px;height:32px;border-radius:9px;background:var(--greenSoft);display:flex;align-items:center;justify-content:center;">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path class="icon-infinity" d="M6 12C6 9.5 8 8 9.8 8C12 8 12 16 14.2 16C16 16 18 14.5 18 12C18 9.5 16 8 14.2 8C12 8 12 16 9.8 16C8 16 6 14.5 6 12Z" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<div style="font-size:12px;font-weight:700;color:var(--text);margin-top:10px;">Solde illimité</div>
+<div style="font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.5;">Fini le plafond à 1M FCFA</div>
+</div>
+
+<div class="premium-card" style="background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:14px;">
+<div style="width:32px;height:32px;border-radius:9px;background:var(--blueSoft);display:flex;align-items:center;justify-content:center;">
+<svg class="icon-bolt" width="15" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 2L4 14H11L10 22L20 9H13L13 2Z" fill="var(--blue)"/>
+</svg>
+</div>
+<div style="font-size:12px;font-weight:700;color:var(--text);margin-top:10px;">Transferts prioritaires</div>
+<div style="font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.5;">Traités en priorité, instantanés</div>
+</div>
+
+<div class="premium-card" style="background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:14px;">
+<div style="width:32px;height:32px;border-radius:9px;background:var(--greenSoft);display:flex;align-items:flex-end;justify-content:center;gap:3px;padding-bottom:6px;">
+<div class="icon-bar1" style="width:4px;background:var(--green);border-radius:2px;"></div>
+<div class="icon-bar2" style="width:4px;background:var(--green);border-radius:2px;"></div>
+<div class="icon-bar3" style="width:4px;background:var(--green);border-radius:2px;"></div>
+</div>
+<div style="font-size:12px;font-weight:700;color:var(--text);margin-top:10px;">Historique illimité</div>
+<div style="font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.5;">+ export PDF</div>
+</div>
+
+</div>
+
+<div style="background:var(--bg);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+<div>
+<div style="font-size:9px;font-weight:800;color:var(--muted);letter-spacing:1px;">PLAFOND DE SOLDE</div>
+<div style="font-size:12px;color:var(--text);margin-top:4px;"><span style="text-decoration:line-through;color:var(--muted);">1 000 000 FCFA</span> → <strong style="color:var(--blue);">Illimité</strong></div>
+</div>
+<div style="font-size:20px;">🎧</div>
+</div>
+
+<button id="btnPremiumConfirm" onclick="passerPremium()" class="premium-cta" style="width:100%;border:1px solid var(--gold);padding:16px;border-radius:12px;font-size:13px;font-weight:800;background:linear-gradient(135deg,#3272ed,#1d4ed8);color:white;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+<span>Devenir Premium — 2 400 FCFA/mois</span>
+<span style="font-size:16px;">→</span>
+</button>
+
+<div style="text-align:center;font-size:10px;color:var(--muted);margin-top:12px;">
+🔒 Paiement sécurisé — Résiliable en un clic depuis votre profil
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =====================================================
+     MODAL SUPPRESSION COMPTE
+===================================================== -->
+
+<div class="overlay" id="overlayDeleteAccount" onclick="outsideDeleteAccount(event)">
+
+<div class="modal">
+
+<div class="modal-header">
+
+<div>
+<div class="modal-label" style="color:var(--blue);">ACTION IRRÉVERSIBLE</div>
+<h2>Supprimer votre compte ?</h2>
+<p>Toutes vos données NEXORA (solde, historique, abonnement) seront définitivement effacées. Cette action est impossible à annuler.</p>
+</div>
+
+<button class="close" onclick="closeDeleteAccountModal()">×</button>
+
+</div>
+
+<div class="form">
+
+<div style="display:flex;gap:10px;margin-top:6px;">
+<button class="btn-outline" style="flex:1;color:var(--text);border-color:var(--line);background:var(--bg);" onclick="closeDeleteAccountModal()">
+Annuler
+</button>
+<button id="btnConfirmDelete" class="btn-danger" style="flex:1;" onclick="confirmDeleteAccount()">
+Supprimer définitivement
+</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function hideScreens(){
+
+document
+.querySelectorAll(".screen")
+.forEach(screen=>{
+screen.classList.remove("active");
+});
+
+}
+
+function showHome(){
+
+hideScreens();
+
+document
+.getElementById("homeScreen")
+.classList.add("active");
+
+}
+
+function showLogin(){
+
+hideScreens();
+
+document
+.getElementById("loginScreen")
+.classList.add("active");
+
+}
+
+function showRegister(){
+
+hideScreens();
+
+document
+.getElementById("registerScreen")
+.classList.add("active");
+
+}
+
+
+/* =========================
+   INSCRIPTION
+========================= */
+
+function updateCountryFields(){
+
+    const select =
+        document.getElementById("registerCountry");
+
+    const option =
+        select.options[select.selectedIndex];
+
+    const code =
+        option ? option.dataset.code : "";
+
+    const bank =
+        option ? option.dataset.bank : "";
+
+    document.getElementById("phoneCode").value = code;
+
+    const bankLabel =
+        document.getElementById("bankLabel");
+
+    const bankInput =
+        document.getElementById("bankIdentifier");
+
+    if(bank){
+
+        bankLabel.textContent =
+            bank.toUpperCase();
+
+        bankInput.placeholder =
+            "Saisissez votre " + bank;
+
+    }else{
+
+        bankLabel.textContent =
+            "IDENTIFIANT BANCAIRE";
+
+        bankInput.placeholder =
+            "Sélectionnez d'abord votre pays";
+
+    }
+}
+
+
+async function register(event){
+
+    event.preventDefault();
+
+    const firstName =
+        document.getElementById("firstName").value.trim();
+
+    const lastName =
+        document.getElementById("lastName").value.trim();
+
+    const email =
+        document.getElementById("registerEmail").value.trim().toLowerCase();
+
+    const country =
+        document.getElementById("registerCountry");
+
+    const countryOption =
+        country.options[country.selectedIndex];
+
+    const countryName =
+        countryOption.textContent.trim();
+
+    const countryCode =
+        country.value;
+
+    const indicatif =
+        countryOption.dataset.code;
+
+    const bankType =
+        countryOption.dataset.bank;
+
+    const phone =
+        document.getElementById("registerPhone")
+        .value.trim();
+
+    const bankIdentifier =
+        document.getElementById("bankIdentifier")
+        .value.trim();
+
+    const birth =
+        document.querySelector(
+            '#registerScreen input[type="date"]'
+        ).value;
+
+    if(!birth){
+
+        alert("Veuillez indiquer votre date de naissance.");
+
+        return;
+    }
+
+    const birthDate = new Date(birth);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const hasHadBirthdayThisYear =
+        (today.getMonth() > birthDate.getMonth()) ||
+        (today.getMonth() === birthDate.getMonth() &&
+         today.getDate() >= birthDate.getDate());
+
+    if(!hasHadBirthdayThisYear){
+        age--;
+    }
+
+    if(age < 18){
+
+        alert(
+            "Vous devez avoir au moins 18 ans pour créer un compte NEXORA."
+        );
+
+        return;
+    }
+
+    const passwordInputs =
+        document.querySelectorAll(
+            '#registerScreen input[type="password"]'
+        );
+
+    const password =
+        passwordInputs[0].value;
+
+    const confirmation =
+        passwordInputs[1].value;
+
+    if(password !== confirmation){
+
+        alert("Les deux mots de passe ne correspondent pas.");
+
+        return;
+    }
+
+    if(password.length < 8){
+
+        alert(
+            "Le mot de passe doit contenir au moins 8 caractères."
+        );
+
+        return;
+    }
+
+    if(!countryCode){
+
+        alert("Veuillez sélectionner votre pays.");
+
+        return;
+    }
+
+    if(!phone){
+
+        alert("Veuillez saisir votre numéro de téléphone.");
+
+        return;
+    }
+
+    if(!bankIdentifier){
+
+        alert(
+            "Veuillez saisir votre " + bankType + "."
+        );
+
+        return;
+    }
+
+    const submit =
+        document.querySelector(
+            '#registerScreen .auth-submit'
+        );
+
+    const oldText =
+        submit.textContent;
+
+    submit.disabled = true;
+    submit.textContent = "Création du compte...";
+
+    try{
+
+        const response =
+            await fetch("/api/inscription", {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:JSON.stringify({
+
+                    nom:lastName,
+
+                    prenom:firstName,
+
+                    email:email,
+
+                    pays:countryName,
+
+                    pays_code:countryCode,
+
+                    indicatif:indicatif,
+
+                    telephone:phone,
+
+                    date_naissance:birth,
+
+                    adresse:"",
+
+                    ville:"",
+
+                    type_document:"",
+
+                    numero_document:"",
+
+                    type_identifiant_bancaire:
+                        bankType,
+
+                    identifiant_bancaire:
+                        bankIdentifier,
+
+                    mot_de_passe:
+                        password
+
+                })
+
+            });
+
+        const result =
+            await response.json();
+
+        if(!response.ok ||
+           !result.success){
+
+            throw new Error(
+                result.message ||
+                "Impossible de créer le compte."
+            );
+
+        }
+
+        /*
+         * Le compte existe maintenant réellement
+         * dans nexora.db.
+         *
+         * On entre directement dans l'application.
+         */
+
+        document.getElementById("verificationEmail").textContent = email;
+
+        hideScreens();
+
+        document
+            .getElementById("verificationScreen")
+            .classList.add("active");
+
+        window.scrollTo(0,0);
+
+    }catch(error){
+
+        alert(
+            "Création du compte impossible.\n\n" +
+            error.message
+        );
+
+    }finally{
+
+        submit.disabled = false;
+        submit.textContent = oldText;
+
+    }
+}
+
+
+let currentUser = null;
+
+function enterDashboard(user){
+
+    currentUser = user;
+
+    const firstName =
+        user.prenom || "";
+
+    const lastName =
+        user.nom || "";
+
+    const fullName =
+        (firstName + " " + lastName).trim();
+
+    const initials =
+        (
+            (firstName[0] || "") +
+            (lastName[0] || "")
+        ).toUpperCase();
+
+    document.getElementById("dashName")
+        .textContent = fullName;
+
+    document.getElementById("greetingName")
+        .textContent =
+            "Bonjour " + firstName + ".";
+
+    document.getElementById("holderName")
+        .textContent =
+            fullName.toUpperCase();
+
+    document.getElementById("dashAvatar")
+        .textContent = initials || "NX";
+
+    /*
+     * ================================
+     * NEXORA PREMIUM
+     * ================================
+     *
+     * Le serveur détermine le type de compte.
+     * Un compte "illimite" bénéficie automatiquement
+     * du dashboard Premium.
+     */
+
+    const premiumDashboard =
+        document.getElementById("premiumDashboard");
+
+    const premiumButton =
+        document.getElementById("btnPremium");
+
+    const isPremium =
+        user.type_compte === "illimite";
+
+    console.log(
+        "NEXORA — TYPE DE COMPTE :",
+        user.type_compte
+    );
+
+    console.log(
+        "NEXORA — PREMIUM :",
+        isPremium ? "ACTIF" : "INACTIF"
+    );
+
+    if(premiumDashboard){
+
+        premiumDashboard.style.display =
+            isPremium ? "block" : "none";
+
+        if(isPremium){
+            premiumDashboard.classList.add(
+                "premium-dashboard-visible"
+            );
+        }else{
+            premiumDashboard.classList.remove(
+                "premium-dashboard-visible"
+            );
+        }
+    }
+
+    /*
+     * Le bouton "Premium" n'est plus nécessaire
+     * pour un compte déjà Premium.
+     */
+
+    if(premiumButton){
+
+        if(isPremium){
+
+            premiumButton.innerHTML =
+                "✦ Premium actif";
+
+            premiumButton.style.border =
+                "1px solid #d4af37";
+
+            premiumButton.style.background =
+                "linear-gradient(135deg,#d4af37,#f6d365,#b8860b)";
+
+            premiumButton.style.color =
+                "#17120a";
+
+        }else{
+
+            premiumButton.innerHTML =
+                "En savoir plus sur Premium";
+
+            premiumButton.style.border =
+                "1px solid var(--gold)";
+
+            premiumButton.style.background =
+                "linear-gradient(135deg,#3272ed,#1d4ed8)";
+
+            premiumButton.style.color =
+                "white";
+        }
+    }
+
+    hideScreens();
+
+    document
+        .getElementById("dashboardScreen")
+        .classList.add("active");
+
+    updateSoldeAffichage();
+
+    renderTransactions();
+    refreshPremiumDashboard();
+
+    /*
+     * Initialise les statistiques Premium
+     * uniquement pour les comptes Premium.
+     */
+
+    if(isPremium){
+
+        if(typeof renderPremiumDashboard === "function"){
+            renderPremiumDashboard();
+        }
+
+        if(typeof animatePremiumDashboard === "function"){
+            animatePremiumDashboard();
+        }
+    }
+
+    window.scrollTo(0,0);
+}
+
+
+/* =========================
+   VERIFICATION
+========================= */
+
+async function verify(event){
+
+    event.preventDefault();
+
+    const code =
+        document
+            .getElementById("verificationCode")
+            .value.trim();
+
+    if(!/^\d{6}$/.test(code)){
+
+        alert("Veuillez entrer un code à 6 chiffres.");
+
+        return;
+    }
+
+    const email =
+        document
+            .getElementById("registerEmail")
+            .value.trim()
+            .toLowerCase();
+
+    if(!email){
+
+        alert("Adresse Gmail introuvable.");
+
+        return;
+    }
+
+    const submit =
+        event.target.querySelector(".auth-submit");
+
+    const oldText =
+        submit ? submit.textContent : "";
+
+    if(submit){
+
+        submit.disabled = true;
+        submit.textContent = "Vérification...";
+    }
+
+    try{
+
+        const response =
+            await fetch("/api/verification-email", {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+                    email:email,
+                    code:code
+                })
+
+            });
+
+        const result =
+            await response.json();
+
+        if(!response.ok || !result.success){
+
+            throw new Error(
+                result.message ||
+                "Impossible de vérifier votre adresse Gmail."
+            );
+        }
+
+        const user =
+            result.utilisateur;
+
+        localStorage.setItem(
+            "nexora_user",
+            JSON.stringify(user)
+        );
+
+        localStorage.setItem(
+            "nexora_token",
+            result.token
+        );
+
+        enterDashboard(user);
+
+    }catch(error){
+
+        alert(
+            "Vérification impossible.\n\n" +
+            error.message
+        );
+
+    }finally{
+
+        if(submit){
+
+            submit.disabled = false;
+            submit.textContent = oldText;
+        }
+    }
+}
+
+
+/* =========================
+   CONNEXION
+========================= */
+
+function login(event){
+
+    event.preventDefault();
+
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
+    if(!email || !password){
+        alert("Veuillez saisir votre Gmail et votre mot de passe.");
+        return;
+    }
+
+    const submit = event.target.querySelector(".auth-submit");
+    const oldText = submit ? submit.textContent : "";
+
+    if(submit){
+        submit.disabled = true;
+        submit.textContent = "Connexion...";
+    }
+
+    fetch("/api/connexion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, mot_de_passe: password })
+    })
+    .then(function(response){
+        return response.json().then(function(result){
+            return { ok: response.ok, result: result };
+        });
+    })
+    .then(function(data){
+
+        if(!data.ok || !data.result.success){
+            throw new Error(data.result.message || "Gmail ou mot de passe incorrect.");
+        }
+
+        localStorage.setItem("nexora_user", JSON.stringify(data.result.utilisateur));
+        localStorage.setItem("nexora_token", data.result.token);
+
+        console.log("TYPE DE COMPTE :", data.result.utilisateur.type_compte);
+
+        enterDashboard(data.result.utilisateur);
+
+    })
+    .catch(function(error){
+        alert("Connexion impossible.\n\n" + error.message);
+    })
+    .finally(function(){
+        if(submit){
+            submit.disabled = false;
+            submit.textContent = oldText;
+        }
+    });
+
+}
+
+
+/* =========================
+   RENVOI CODE
+========================= */
+
+function resendCode(){
+
+alert(
+"Dans la version connectée, un nouveau code sera envoyé sur votre téléphone."
+);
+
+}
+
+
+/* =========================
+   MODAL PREMIUM
+========================= */
+
+function openPremiumModal(){
+
+    const user = currentUser;
+
+    if(!user){
+        alert("Veuillez vous connecter pour accéder à Premium.");
+        return;
+    }
+
+    if(
+        user.type_compte === "illimite" ||
+        Number(user.abonnement_actif) === 1
+    ){
+        activerInterfacePremium();
+        return;
+    }
+
+    const overlay = document.getElementById("overlayPremium");
+
+    if(overlay){
+        overlay.classList.add("open");
+    }
+}
+
+
+async function payerPremium(){
+
+    const token =
+        localStorage.getItem("nexora_token");
+
+    if(!token){
+        alert(
+            "Votre session a expiré. Veuillez vous reconnecter."
+        );
+        return;
+    }
+
+    const bouton =
+        document.getElementById("btnPayerPremium");
+
+    if(bouton){
+        bouton.disabled = true;
+        bouton.textContent =
+            "Préparation du paiement...";
+    }
+
+    try{
+
+        const response =
+            await fetch("/api/abonnement/payer", {
+                method: "POST",
+                headers: {
+                    "Authorization":
+                        "Bearer " + token
+                }
+            });
+
+        const result =
+            await response.json();
+
+        if(
+            !response.ok ||
+            !result.success ||
+            !result.url
+        ){
+            throw new Error(
+                result.message ||
+                "Impossible de préparer le paiement."
+            );
+        }
+
+        localStorage.setItem(
+            "nexora_paiement_premium",
+            "en_cours"
+        );
+
+        window.location.href =
+            result.url;
+
+    }catch(error){
+
+        console.error(
+            "Erreur paiement Premium :",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Erreur pendant la préparation du paiement."
+        );
+
+        if(bouton){
+            bouton.disabled = false;
+            bouton.textContent =
+                "Passer à Premium";
+        }
+    }
+}
+
+
+async function verifierStatutPremium(){
+
+    const token =
+        localStorage.getItem("nexora_token");
+
+    if(!token){
+        return false;
+    }
+
+    try{
+
+        const response =
+            await fetch("/api/session", {
+                method: "GET",
+                headers: {
+                    "Authorization":
+                        "Bearer " + token
+                },
+                cache: "no-store"
+            });
+
+        const result =
+            await response.json();
+
+        if(
+            !response.ok ||
+            !result.success
+        ){
+            return false;
+        }
+
+        const utilisateur =
+            result.utilisateur ||
+            result.user ||
+            null;
+
+        if(!utilisateur){
+            return false;
+        }
+
+        /*
+         * Le serveur est la seule source de vérité.
+         * Le navigateur ne décide pas lui-même du Premium.
+         */
+        currentUser = utilisateur;
+
+        const premiumActif =
+            utilisateur.type_compte === "illimite" &&
+            Number(utilisateur.abonnement_actif) === 1 &&
+            utilisateur.abonnement_expiration &&
+            new Date(utilisateur.abonnement_expiration).getTime() > Date.now();
+
+        if(premiumActif){
+
+            localStorage.removeItem(
+                "nexora_paiement_premium"
+            );
+
+            activerInterfacePremium();
+
+            return true;
+        }
+
+        /*
+         * Si le serveur indique Standard,
+         * on remet également l'interface en mode Standard.
+         */
+        desactiverInterfacePremium();
+
+        return false;
+
+    }catch(error){
+
+        console.error(
+            "Erreur vérification Premium :",
+            error
+        );
+    }
+
+    return false;
+}
+
+
+function desactiverInterfacePremium(){
+
+    const dashboard =
+        document.getElementById("premiumDashboard");
+
+    const bouton =
+        document.getElementById("btnPremium");
+
+    if(dashboard){
+        dashboard.style.display = "none";
+    }
+
+    if(bouton){
+        bouton.style.display = "";
+    }
+
+    document.body.classList.remove(
+        "premium-active"
+    );
+}
+
+
+
+function activerInterfacePremium(){
+
+    const dashboard =
+        document.getElementById(
+            "premiumDashboard"
+        );
+
+    const bouton =
+        document.getElementById(
+            "btnPremium"
+        );
+
+    if(dashboard){
+        dashboard.style.display =
+            "block";
+    }
+
+    if(bouton){
+        bouton.style.display =
+            "none";
+    }
+
+    document.body.classList.add(
+        "premium-active"
+    );
+
+    if(
+        typeof updateSoldeAffichage ===
+        "function"
+    ){
+        updateSoldeAffichage();
+    }
+
+    if(
+        typeof refreshPremiumDashboard ===
+        "function"
+    ){
+        refreshPremiumDashboard();
+    }
+
+    if(
+        typeof updatePremiumChart ===
+        "function"
+    ){
+        updatePremiumChart(
+            getTransactions()
+        );
+    }
+
+    console.log(
+        "✅ Interface Premium activée."
+    );
+}
+
+
+async function demarrerVerificationPremium(){
+
+    const paiement =
+        localStorage.getItem("nexora_paiement_premium");
+
+    if(paiement !== "en_cours"){
+        return;
+    }
+
+    /*
+     * FedaPay peut prendre quelques secondes avant
+     * que le webhook mette SQLite à jour.
+     *
+     * On vérifie donc régulièrement le serveur.
+     */
+    const tentatives = 30;
+
+    for(let i = 0; i < tentatives; i++){
+
+        const premium =
+            await verifierStatutPremium();
+
+        if(premium){
+
+            localStorage.removeItem(
+                "nexora_paiement_premium"
+            );
+
+            activerInterfacePremium();
+
+            console.log(
+                "✅ Paiement Premium confirmé par le serveur."
+            );
+
+            return;
+        }
+
+        /*
+         * Attendre 2 secondes avant la prochaine vérification.
+         */
+        await new Promise(function(resolve){
+            setTimeout(resolve, 2000);
+        });
+    }
+
+    /*
+     * Après 60 secondes, le paiement n'a toujours pas
+     * été confirmé par le serveur.
+     */
+    console.warn(
+        "Paiement Premium encore en attente de confirmation."
+    );
+
+    alert(
+        "Votre paiement est en cours de confirmation. " +
+        "Votre espace Premium apparaîtra automatiquement " +
+        "dès que FedaPay aura confirmé le paiement."
+    );
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        demarrerVerificationPremium();
+
+    }
+);
+
+
+function closePremiumModal(){
+    document.getElementById("overlayPremium").classList.remove("open");
+}
+
+function outsidePremium(event){
+    if(event.target.id === "overlayPremium"){
+        closePremiumModal();
+    }
+}
+
+/* =========================
+   MENU COMPTE
+========================= */
+
+function toggleAccountMenu(event){
+    event.stopPropagation();
+    document.getElementById("accountDropdown").classList.toggle("open");
+}
+
+function closeAccountMenu(){
+    document.getElementById("accountDropdown").classList.remove("open");
+}
+
+document.addEventListener("click", function(){
+    closeAccountMenu();
+});
+
+/* =========================
+   SUPPRESSION DU COMPTE
+========================= */
+
+function openDeleteAccountModal(){
+    document.getElementById("overlayDeleteAccount").classList.add("open");
+}
+
+function closeDeleteAccountModal(){
+    document.getElementById("overlayDeleteAccount").classList.remove("open");
+}
+
+function outsideDeleteAccount(event){
+    if(event.target.id === "overlayDeleteAccount"){
+        closeDeleteAccountModal();
+    }
+}
+
+async function confirmDeleteAccount(){
+
+    const btn =
+        document.getElementById("btnConfirmDelete");
+
+    const oldText =
+        btn.textContent;
+
+    const token =
+        localStorage.getItem("nexora_token");
+
+    if(!token){
+        alert("Veuillez vous reconnecter pour continuer.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Suppression...";
+    btn.style.background = "#dc2626";
+    btn.style.boxShadow = "0 10px 23px rgba(220,38,38,.3)";
+
+    try{
+
+        const response =
+            await fetch("/api/compte/supprimer", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+        const result =
+            await response.json();
+
+        if(!response.ok || !result.success){
+            throw new Error(result.message || "Erreur lors de la suppression.");
+        }
+
+        localStorage.removeItem("nexora_user");
+        localStorage.removeItem("nexora_token");
+
+        closeDeleteAccountModal();
+        hideScreens();
+
+        document
+            .getElementById("homeScreen")
+            .classList.add("active");
+
+        window.scrollTo(0,0);
+
+    }catch(error){
+
+        alert(error.message);
+
+        btn.disabled = false;
+        btn.textContent = oldText;
+
+    }
+}
+
+/* =========================
+   ABONNEMENT PREMIUM
+========================= */
+
+async function passerPremium(){
+
+    const btn =
+        document.getElementById("btnPremiumConfirm");
+
+    if(!btn){
+        console.error("Bouton Premium introuvable.");
+        return;
+    }
+
+    const oldText =
+        btn.textContent;
+
+    btn.disabled = true;
+    btn.textContent = "Redirection...";
+
+    try{
+
+        const token =
+            localStorage.getItem("nexora_token");
+
+        if(!token){
+            throw new Error(
+                "Veuillez vous reconnecter pour continuer."
+            );
+        }
+
+        const response =
+            await fetch("/api/abonnement/payer", {
+                method: "POST",
+                headers: {
+                    "Authorization":
+                        "Bearer " + token
+                },
+                cache: "no-store"
+            });
+
+        const result =
+            await response.json();
+
+        if(
+            !response.ok ||
+            !result.success ||
+            !result.url
+        ){
+            throw new Error(
+                result.message ||
+                "Impossible de démarrer le paiement."
+            );
+        }
+
+        /*
+         * Le paiement existe maintenant côté FedaPay.
+         * Le navigateur ne considère PAS encore
+         * l'utilisateur comme Premium.
+         */
+        localStorage.setItem(
+            "nexora_paiement_premium",
+            "en_cours"
+        );
+
+        window.location.href =
+            result.url;
+
+    }catch(error){
+
+        console.error(
+            "Erreur paiement Premium :",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Erreur pendant le paiement."
+        );
+
+        btn.disabled = false;
+        btn.textContent = oldText;
+    }
+}
+
+
+/* =========================
+   SESSION / DÉCONNEXION
+========================= */
+
+function logout(){
+
+    const confirmation =
+        confirm(
+            "Voulez-vous vraiment vous déconnecter ?"
+        );
+
+    if(!confirmation){
+        return;
+    }
+
+    localStorage.removeItem("nexora_user");
+    localStorage.removeItem("nexora_token");
+
+    hideScreens();
+
+    document
+        .getElementById("homeScreen")
+        .classList.add("active");
+
+    window.scrollTo(0,0);
+}
+
+/* =========================
+   TRANSFERT
+========================= */
+
+const overlay=
+document.getElementById("overlay");
+
+const formArea=
+document.getElementById("formArea");
+
+const success=
+document.getElementById("success");
+
+function openModal(){
+
+overlay.classList.add("open");
+
+document.body.style.overflow="hidden";
+
+}
+
+function closeModal(){
+
+overlay.classList.remove("open");
+
+document.body.style.overflow="";
+
+setTimeout(()=>{
+
+formArea.style.display="block";
+
+success.classList.remove("show");
+
+},250);
+
+}
+
+function outside(event){
+
+if(event.target===overlay){
+
+closeModal();
+
+}
+
+}
+
+function money(value){
+
+return new Intl.NumberFormat("fr-FR")
+.format(value||0);
+
+}
+
+const SOLDE_INITIAL = 1000000;
+
+function getSoldeKey(){
+    if(currentUser && currentUser.id){
+        return "nexora_solde_user_" + currentUser.id;
+    }
+
+    return "nexora_solde";
+}
+
+function getSolde(){
+    const stocke = localStorage.getItem(getSoldeKey());
+
+    if(stocke === null){
+        return SOLDE_INITIAL;
+    }
+
+    const valeur = Number(stocke);
+
+    return Number.isFinite(valeur) && valeur >= 0
+        ? valeur
+        : 0;
+}
+
+function setSolde(valeur){
+
+    valeur = Number(valeur);
+
+    if(!Number.isFinite(valeur)){
+        valeur = 0;
+    }
+
+    if(valeur < 0){
+        valeur = 0;
+    }
+
+    /*
+     * SEUL UN COMPTE "illimite" peut renouveler
+     * automatiquement son solde.
+     */
+    if(
+        valeur <= 0 &&
+        currentUser &&
+        currentUser.type_compte === "illimite"
+    ){
+        valeur = SOLDE_INITIAL;
+    }
+
+    localStorage.setItem(
+        getSoldeKey(),
+        String(valeur)
+    );
+
+    updateSoldeAffichage();
+}
+
+function updateSoldeAffichage(){
+    const solde = getSolde();
+    const el = document.getElementById("balanceAmount");
+    if(el){
+        el.textContent = money(solde);
+    }
+    const summaryBalance = document.getElementById("summaryBalance");
+    if(summaryBalance){
+        summaryBalance.textContent = money(solde);
+    }
+}
+
+function calculate(){
+
+const amount=
+Number(
+document.getElementById("amount").value
+)||0;
+
+const devise =
+document.getElementById("currency")
+? document.getElementById("currency").value
+: "EUR";
+
+document
+.getElementById("sum")
+.textContent=
+money(amount)+" "+devise;
+
+document
+.getElementById("total")
+.textContent=
+money(amount)+" "+devise;
+
+const summaryBalance = document.getElementById("summaryBalance");
+if(summaryBalance){
+    summaryBalance.textContent = money(getSolde())+" EUR";
+}
+
+const recipientEl = document.getElementById("summaryRecipient");
+const nameField = document.getElementById("recipientName");
+if(recipientEl && nameField){
+    recipientEl.textContent = nameField.value || "-";
+}
+
+}
+
+function reference(){
+
+const chars=
+"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+let result="NXR-";
+
+for(let i=0;i<8;i++){
+
+result+=
+chars[
+Math.floor(
+Math.random()*chars.length
+)
+];
+
+}
+
+return result;
+
+}
+
+async function send(event){
+
+    event.preventDefault();
+
+    const amount =
+        Number(
+            document.getElementById("amount").value
+        );
+
+    const recipientName =
+        document.getElementById("recipientName").value.trim();
+
+    const recipientEmail =
+        document.getElementById("recipientEmail").value.trim();
+
+    const motif =
+        document.getElementById("reason").value.trim();
+
+    const operationType =
+        document.getElementById("operationType").value;
+
+    const currency =
+        document.getElementById("currency").value;
+
+    if(amount <= 0){
+        alert("Veuillez saisir un montant.");
+        return;
+    }
+
+    if(!recipientEmail){
+        alert("Veuillez saisir l'email du destinataire.");
+        return;
+    }
+
+    const soldeActuel = getSolde();
+
+    if(operationType !== "recevoir" && amount > soldeActuel){
+        alert("Solde insuffisant pour effectuer ce virement.");
+        return;
+    }
+
+    const nouveauSolde =
+        operationType === "recevoir"
+            ? soldeActuel + amount
+            : soldeActuel - amount;
+
+    setSolde(nouveauSolde);
+
+    const ref = reference();
+
+    document
+        .getElementById("reference")
+        .textContent = ref;
+
+    formArea.style.display = "none";
+    success.classList.add("show");
+
+    const dateAffichage = formaterDateHeure(new Date());
+
+    const transactionRecord = {
+        sens: operationType,
+        contrepartie: recipientName,
+        montant: amount,
+        devise: currency,
+        motif: motif || "Non précisé",
+        reference: ref,
+        agence: currentUser
+            ? (currentUser.prenom + " " + currentUser.nom).trim()
+            : AGENCE_EMETTRICE,
+        date: dateAffichage
+    };
+
+    saveTransaction(transactionRecord);
+    lastTransaction = transactionRecord;
+    renderTransactions();
+
+    // Mise à jour immédiate du dashboard Premium
+    refreshPremiumDashboard();
+
+    /* =========================
+       NOTIFICATION TÉLÉPHONE
+    ========================= */
+
+    const autorise =
+        await demanderPermissionNotifications();
+
+    if(autorise){
+
+        const nomExpediteur = currentUser
+            ? (currentUser.prenom + " " + currentUser.nom).trim()
+            : "Utilisateur NEXORA";
+
+        notifierVirementRecu({
+            expediteur: nomExpediteur,
+            montant: amount,
+            motif: motif || "Non précisé",
+            reference: ref
+        });
+
+    }
+
+    /* =========================
+       NOTIFICATION EMAIL
+    ========================= */
+
+    try {
+
+        const response =
+            await fetch("/api/notifier-virement", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    email: recipientEmail,
+
+                    sens:
+                        operationType === "recevoir"
+                            ? "envoye"
+                            : "recu",
+
+                    contrepartie:
+                        currentUser
+                            ? (currentUser.prenom + " " + currentUser.nom).trim()
+                            : AGENCE_EMETTRICE,
+
+                    montant: amount,
+
+                    devise: currency,
+
+                    motif:
+                        motif || "Non précisé",
+
+                    reference: ref
+
+                })
+
+            });
+
+        const result =
+            await response.json();
+
+        if(!response.ok || !result.success){
+
+            console.error(
+                "Erreur notification email :",
+                result.message
+            );
+
+        }else{
+
+            console.log(
+                "Email NEXORA envoyé avec succès."
+            );
+
+        }
+
+    } catch(error){
+
+        console.error(
+            "Impossible d'envoyer la notification email :",
+            error
+        );
+
+    }
+
+}
+
+/* =========================
+   NOTIFICATION - VIREMENT RECU
+========================= */
+
+function formaterDateHeure(date){
+    const options = {
+        timeZone: "Europe/Paris",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    };
+    const parts = new Intl.DateTimeFormat("fr-FR", options).formatToParts(date);
+    const get = function(type){
+        const found = parts.find(function(p){ return p.type === type; });
+        return found ? found.value : "";
+    };
+    return get("day")+"/"+get("month")+"/"+get("year")+" à "+get("hour")+":"+get("minute");
+}
+
+async function notifierVirementRecu(details){
+
+    if(Notification.permission !== "granted"){
+        return;
+    }
+
+    const dateHeure = formaterDateHeure(new Date());
+    const montantFormate = money(details.montant) + " FCFA";
+
+    const registration = await navigator.serviceWorker.ready;
+
+    registration.showNotification("NEXORA - Virement recu", {
+        body:
+            "Vous avez recu un virement de "+details.expediteur+" d'un montant de "+montantFormate+".\n\n"+
+            "Motif : "+details.motif+"\n"+
+            "Date : "+dateHeure+"\n"+
+            "Reference : "+details.reference,
+        icon: "/icon-192.png",
+        badge: "/icon-96.png",
+        tag: details.reference,
+        data: { url: "/", reference: details.reference }
+    });
+}
+
+/* =========================
+   HISTORIQUE DES TRANSACTIONS
+========================= */
+
+const AGENCE_EMETTRICE = "NEXORA Transfert";
+
+let lastTransaction = null;
+
+function getTransactionsKey(){
+    if(currentUser && currentUser.id){
+        return "nexora_transactions_user_" + currentUser.id;
+    }
+
+    return "nexora_transactions";
+}
+
+function getTransactions(){
+    try{
+        return JSON.parse(
+            localStorage.getItem(getTransactionsKey()) || "[]"
+        );
+    }catch(e){
+        return [];
+    }
+}
+
+function saveTransaction(tx){
+    const list = getTransactions();
+
+    list.unshift(tx);
+
+    if(list.length > 30){
+        list.length = 30;
+    }
+
+    localStorage.setItem(
+        getTransactionsKey(),
+        JSON.stringify(list)
+    );
+}
+
+function renderTransactions(){
+
+    const list = getTransactions().slice(0, 5);
+
+    const recentEl = document.getElementById("recentTransactionsList");
+    const notifEl = document.getElementById("notificationsList");
+
+    if(recentEl){
+        if(list.length === 0){
+            recentEl.innerHTML = '<p class="tx-empty" style="color:#7c8798;padding:12px 0">Aucune transaction pour l\'instant.</p>';
+        }else{
+            recentEl.innerHTML = list.map(function(tx, i){
+                const isOut = tx.sens === "envoyer";
+                return '<div class="transaction" style="cursor:pointer" onclick="showTransactionDetail('+i+')">'+
+                    '<div class="tx-icon '+(isOut?"tx-out":"tx-in")+'">'+(isOut?"↑":"↓")+'</div>'+
+                    '<div class="tx-info">'+
+                        '<strong>'+(isOut?"Vers ":"De ")+tx.contrepartie+'</strong>'+
+                        '<span>'+tx.date+'</span>'+
+                        '<small class="tx-ref">'+tx.reference+'</small>'+
+                    '</div>'+
+                    '<div class="tx-value '+(isOut?"":"tx-positive")+'">'+(isOut?"−":"+")+money(tx.montant)+'<small>'+tx.devise+'</small></div>'+
+                '</div>';
+            }).join("");
+        }
+    }
+
+    if(notifEl){
+        if(list.length === 0){
+            notifEl.innerHTML = '<p class="tx-empty" style="color:#7c8798;padding:12px 0">Aucune notification pour l\'instant.</p>';
+        }else{
+            notifEl.innerHTML = list.map(function(tx){
+                const isOut = tx.sens === "envoyer";
+                return '<div class="notification-item">'+
+                    '<div class="notif-icon">'+(isOut?"↑":"↓")+'</div>'+
+                    '<div>'+
+                        '<strong>'+(isOut?"Virement envoyé":"Virement reçu")+'</strong>'+
+                        '<p>'+(isOut?"Vous avez envoyé ":"Vous avez reçu ")+'<b>'+money(tx.montant)+' '+tx.devise+'</b> '+(isOut?"à ":"de ")+tx.contrepartie+'.</p>'+
+                        '<time>'+tx.date+'</time>'+
+                    '</div>'+
+                '</div>';
+            }).join("");
+        }
+    }
+}
+
+/* =====================================================
+   DASHBOARD PREMIUM — DONNÉES DYNAMIQUES
+===================================================== */
+
+
+function updatePremiumDashboard(){
+
+    const dashboard =
+        document.getElementById("premiumDashboard");
+
+    if(!dashboard){
+        return;
+    }
+
+    const transactions = getTransactions();
+
+    let entrees = 0;
+    let sorties = 0;
+
+    transactions.forEach(function(tx){
+
+        const montant =
+            Number(tx.montant) || 0;
+
+        if(tx.sens === "envoyer"){
+            sorties += montant;
+        }else{
+            entrees += montant;
+        }
+
+    });
+
+    const solde = getSolde();
+
+    const entreesEl =
+        document.getElementById("premiumEntrees");
+
+    const sortiesEl =
+        document.getElementById("premiumSorties");
+
+    if(entreesEl){
+        entreesEl.textContent =
+            money(entrees) + " EUR";
+    }
+
+    if(sortiesEl){
+        sortiesEl.textContent =
+            money(sorties) + " EUR";
+    }
+
+    /*
+     * SOLDE PREMIUM DYNAMIQUE
+     */
+
+    const balanceElements = [
+        document.getElementById("premiumBalance"),
+        document.getElementById("premiumSolde")
+    ];
+
+    balanceElements.forEach(function(el){
+
+        if(el){
+            el.textContent =
+                money(solde) + " EUR";
+        }
+
+    });
+
+    /*
+     * ACTIVITÉ
+     */
+
+    const totalOperations =
+        transactions.length;
+
+    const activityEl =
+        document.getElementById("premiumActivity");
+
+    if(activityEl){
+
+        activityEl.textContent =
+            totalOperations +
+            (totalOperations > 1
+                ? " opérations"
+                : " opération");
+
+    }
+
+    /*
+     * DERNIÈRE OPÉRATION
+     */
+
+    const lastEl =
+        document.getElementById("premiumLastOperation");
+
+    if(lastEl){
+
+        if(transactions.length === 0){
+
+            lastEl.textContent =
+                "Aucune opération";
+
+        }else{
+
+            const tx =
+                transactions[0];
+
+            const signe =
+                tx.sens === "envoyer"
+                    ? "−"
+                    : "+";
+
+            lastEl.textContent =
+                signe +
+                money(tx.montant) +
+                " " +
+                (tx.devise || "FCFA");
+
+        }
+
+    }
+
+    /*
+     * STATUT DU COMPTE
+     */
+
+    const statusEl =
+        document.getElementById("premiumBalanceStatus");
+
+    if(statusEl){
+
+        if(solde <= 0){
+
+            statusEl.textContent =
+                "Renouvellement Premium";
+
+        }else if(solde <= 200000){
+
+            statusEl.textContent =
+                "Solde faible";
+
+        }else{
+
+            statusEl.textContent =
+                "Compte actif";
+
+        }
+
+    }
+
+    /*
+     * GRAPHIQUE
+     */
+
+    updatePremiumChart(transactions);
+
+}
+
+
+/* =====================================================
+   GRAPHIQUE PREMIUM DYNAMIQUE
+===================================================== */
+
+function updatePremiumChart(transactions){
+
+    const svg =
+        document.querySelector(".premium-chart-svg");
+
+    if(!svg){
+        return;
+    }
+
+    const line =
+        svg.querySelector(".premium-chart-line");
+
+    const area =
+        svg.querySelector(".premium-chart-area");
+
+    if(!line || !area){
+        return;
+    }
+
+    /*
+     * Aucun mouvement :
+     * afficher une ligne stable.
+     */
+
+    if(!transactions || transactions.length === 0){
+
+        const d =
+            "M0 135 C100 135 200 135 300 135 C400 135 500 135 600 135";
+
+        line.setAttribute("d", d);
+
+        area.setAttribute(
+            "d",
+            d + " L600 190 L0 190 Z"
+        );
+
+        return;
+    }
+
+    /*
+     * On reconstruit l'évolution du solde
+     * à partir des transactions.
+     */
+
+    let solde =
+        getSolde();
+
+    const points = [];
+
+    /*
+     * Les transactions sont stockées
+     * de la plus récente à la plus ancienne.
+     * On reconstruit donc le parcours
+     * dans l'ordre inverse.
+     */
+
+    const ordered =
+        transactions
+            .slice()
+            .reverse();
+
+    const balances = [];
+
+    ordered.forEach(function(tx){
+
+        const montant =
+            Number(tx.montant) || 0;
+
+        if(tx.sens === "envoyer"){
+
+            balances.push(solde);
+
+            solde += montant;
+
+        }else{
+
+            balances.push(solde);
+
+            solde -= montant;
+
+        }
+
+    });
+
+    balances.push(getSolde());
+
+    let min =
+        Math.min.apply(null, balances);
+
+    let max =
+        Math.max.apply(null, balances);
+
+    if(min === max){
+
+        min -= 1;
+        max += 1;
+
+    }
+
+    const width = 600;
+    const height = 190;
+
+    const paddingTop = 20;
+    const paddingBottom = 20;
+
+    const usableHeight =
+        height -
+        paddingTop -
+        paddingBottom;
+
+    balances.forEach(function(value,index){
+
+        const x =
+            balances.length === 1
+                ? width / 2
+                : (index / (balances.length - 1)) * width;
+
+        const ratio =
+            (value - min) /
+            (max - min);
+
+        const y =
+            height -
+            paddingBottom -
+            ratio * usableHeight;
+
+        points.push({
+            x:x,
+            y:y
+        });
+
+    });
+
+    /*
+     * Courbe Bézier lissée
+     */
+
+    let d =
+        "M" +
+        points[0].x +
+        " " +
+        points[0].y;
+
+    for(let i = 1; i < points.length; i++){
+
+        const previous =
+            points[i - 1];
+
+        const current =
+            points[i];
+
+        const middleX =
+            (previous.x + current.x) / 2;
+
+        d +=
+            " C" +
+            middleX + " " +
+            previous.y +
+            " " +
+            middleX + " " +
+            current.y +
+            " " +
+            current.x + " " +
+            current.y;
+
+    }
+
+    const areaD =
+        d +
+        " L600 190 L0 190 Z";
+
+    line.setAttribute("d", d);
+
+    area.setAttribute("d", areaD);
+
+    /*
+     * Animation
+     */
+
+    line.style.transition =
+        "d 0.8s ease";
+
+    area.style.transition =
+        "d 0.8s ease";
+
+    /*
+     * Labels
+     */
+
+    const labels =
+        document.querySelectorAll(
+            ".premium-chart-labels span"
+        );
+
+    if(labels.length){
+
+        const count =
+            transactions.length;
+
+        if(count === 1){
+
+            labels[0].textContent =
+                "Début";
+
+            labels[1].textContent =
+                "";
+
+            labels[2].textContent =
+                "";
+
+            labels[3].textContent =
+                "Aujourd'hui";
+
+        }else{
+
+            labels[0].textContent =
+                "Début";
+
+            labels[1].textContent =
+                count >= 3
+                    ? "Activité"
+                    : "";
+
+            labels[2].textContent =
+                count >= 5
+                    ? "Récent"
+                    : "";
+
+            labels[3].textContent =
+                "Aujourd'hui";
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   RAFRAÎCHISSEMENT PREMIUM
+===================================================== */
+
+function refreshPremiumDashboard(){
+
+    updatePremiumDashboard();
+
+}
+
+
+/* =====================================================
+   MISE À JOUR APRÈS TRANSACTION
+===================================================== */
+
+function refreshAfterTransaction(){
+
+    updateSoldeAffichage();
+
+    renderTransactions();
+
+    refreshPremiumDashboard();
+
+}
+
+/* =========================
+   PREUVE D'ENVOI (RECU)
+========================= */
+
+function shareReceipt(txParam){
+
+    const tx = txParam || lastTransaction;
+
+    if(!tx){
+        return;
+    }
+    const isOut = tx.sens === "envoyer";
+
+    const texte =
+        "NEXORA — "+(isOut?"Virement envoyé":"Virement reçu")+"\n\n"+
+        (isOut?"Destinataire : ":"Expéditeur : ")+tx.contrepartie+"\n"+
+        "Montant : "+money(tx.montant)+" "+tx.devise+"\n"+
+        "Motif : "+tx.motif+"\n"+
+        "Date : "+tx.date+"\n"+
+        "Référence : "+tx.reference+"\n"+
+        "Émetteur : "+tx.agence;
+
+    if(navigator.share){
+        navigator.share({ title: "Reçu NEXORA", text: texte }).catch(function(){});
+    }else if(navigator.clipboard){
+        navigator.clipboard.writeText(texte).then(function(){
+            alert("Reçu copié dans le presse-papiers.");
+        });
+    }else{
+        alert(texte);
+    }
+}
+
+function downloadReceiptImage(txParam){
+
+    const tx = txParam || lastTransaction;
+
+    if(!tx){
+        return;
+    }
+    const isOut = tx.sens === "envoyer";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 640;
+    canvas.height = 600;
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#f4f6fb";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#e2e6ee";
+    ctx.lineWidth = 1;
+    ctx.fillRect(20,20,600,560);
+    ctx.strokeRect(20,20,600,560);
+
+    ctx.fillStyle = "#0b1b3a";
+    ctx.fillRect(20,20,600,90);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 26px sans-serif";
+    ctx.fillText("NEXORA", 45, 60);
+
+    ctx.font = "14px sans-serif";
+    ctx.fillStyle = "#c9d3e6";
+    ctx.fillText("Reçu de transaction", 45, 85);
+
+    ctx.fillStyle = isOut ? "#b23b3b" : "#1f8a4c";
+    ctx.font = "bold 18px sans-serif";
+    ctx.fillText(isOut?"VIREMENT ENVOYÉ":"VIREMENT REÇU", 45, 135);
+
+    ctx.fillStyle = "#0b1b3a";
+    ctx.font = "bold 34px sans-serif";
+    ctx.fillText(money(tx.montant)+" "+tx.devise, 45, 180);
+
+    ctx.strokeStyle = "#e2e6ee";
+    ctx.beginPath();
+    ctx.moveTo(45,205);
+    ctx.lineTo(595,205);
+    ctx.stroke();
+
+    const lignes = [
+        [(isOut?"Destinataire":"Expéditeur"), tx.contrepartie],
+        ["Motif", tx.motif],
+        ["Date", tx.date],
+        ["Référence", tx.reference],
+        ["Émetteur", tx.agence]
+    ];
+
+    let y = 245;
+
+    lignes.forEach(function(ligne){
+        ctx.font = "13px sans-serif";
+        ctx.fillStyle = "#7c8798";
+        ctx.fillText(ligne[0].toUpperCase(), 45, y);
+        ctx.font = "bold 17px sans-serif";
+        ctx.fillStyle = "#0b1b3a";
+        ctx.fillText(String(ligne[1]), 45, y + 24);
+        y += 60;
+    });
+
+    ctx.strokeStyle = "#e2e6ee";
+    ctx.beginPath();
+    ctx.moveTo(45,y+5);
+    ctx.lineTo(595,y+5);
+    ctx.stroke();
+
+    ctx.fillStyle = "#1f8a4c";
+    ctx.font = "bold 14px sans-serif";
+    ctx.fillText("✓ Transaction vérifiée", 45, y + 35);
+
+    const link = document.createElement("a");
+    link.download = "recu-"+tx.reference+".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+}
+
+/* =========================
+   DETAIL TRANSACTION
+========================= */
+
+let currentDetailTransaction = null;
+
+function showTransactionDetail(index){
+
+    const list = getTransactions();
+    const tx = list[index];
+
+    if(!tx){
+        return;
+    }
+
+    currentDetailTransaction = tx;
+
+    const isOut = tx.sens === "envoyer";
+
+    document.getElementById("detailIcon").textContent = isOut ? "↑" : "↓";
+
+    document.getElementById("detailAmount").textContent =
+        (isOut?"− ":"+ ")+money(tx.montant)+" "+tx.devise;
+
+    document.getElementById("detailAmount").style.color =
+        isOut ? "#0b1b3a" : "#1f8a4c";
+
+    document.getElementById("detailTitle").textContent =
+        (isOut?"Vers ":"De ")+tx.contrepartie;
+
+    document.getElementById("detailDate").textContent = tx.date;
+    document.getElementById("detailPriseEnCompte").textContent = tx.date;
+    document.getElementById("detailMotif").textContent = tx.motif;
+    document.getElementById("detailReference").textContent = tx.reference;
+
+    document.getElementById("transactionDetailModal").style.display = "flex";
+}
+
+function closeTransactionDetail(){
+    document.getElementById("transactionDetailModal").style.display = "none";
+}
+
+/* =========================
+   NOTIFICATIONS
+========================= */
+
+async function demanderPermissionNotifications(){
+
+    if(!("Notification" in window)){
+        console.log("Les notifications ne sont pas supportées.");
+        return false;
+    }
+
+    if(Notification.permission === "granted"){
+        return true;
+    }
+
+    if(Notification.permission === "denied"){
+        console.log("Les notifications NEXORA sont bloquées.");
+        return false;
+    }
+
+    const permission = await Notification.requestPermission();
+
+    return permission === "granted";
+}
+
+/* =========================
+   NOTIFICATIONS
+========================= */
+
+
+
+async function notify(){
+
+    const autorise =
+        await demanderPermissionNotifications();
+
+    if(autorise){
+        alert(
+            "Centre de notifications\n\n"+
+            "Notifications NEXORA activées."
+        );
+    }else{
+        alert(
+            "Centre de notifications\n\n"+
+            "Les notifications NEXORA ne sont pas activées."
+        );
+    }
+
+}
+
+
+/* =========================
+   CLAVIER
+========================= */
+
+document.addEventListener(
+"keydown",
+event=>{
+
+if(event.key==="Escape"){
+
+closeModal();
+
+}
+
+}
+);
+
+/* =========================
+   RESTAURATION DE SESSION
+========================= */
+
+(function restoreSession(){
+
+    const token = localStorage.getItem("nexora_token");
+
+    if(!token){
+        return;
+    }
+
+    fetch("/api/session", {
+        headers: { "Authorization": "Bearer " + token }
+    })
+    .then(function(response){
+        return response.json().then(function(result){
+            return { ok: response.ok, result: result };
+        });
+    })
+    .then(function(data){
+
+        if(data.ok && data.result.success && data.result.utilisateur){
+
+            enterDashboard(data.result.utilisateur);
+
+        }else{
+
+            localStorage.removeItem("nexora_user");
+            localStorage.removeItem("nexora_token");
+        }
+
+    })
+    .catch(function(error){
+
+        localStorage.removeItem("nexora_user");
+        localStorage.removeItem("nexora_token");
+    });
+
+})();
+
+
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/service-worker.js")
+            .then(function (registration) {
+                console.log("NEXORA Service Worker actif :", registration.scope);
+            })
+            .catch(function (error) {
+                console.error("Erreur Service Worker :", error);
+            });
+    });
+}
+</script>
+
+</body>
+</html>
