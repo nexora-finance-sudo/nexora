@@ -158,7 +158,7 @@ async function sendVirementEmail(to, details) {
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = "0.0.0.0";
-const DB = path.join(__dirname, "nexora.db");
+const DB = process.env.NEXORA_DB_PATH || path.join(__dirname, "nexora.db");
 
 function sqlite(sql, params = []) {
     return new Promise((resolve, reject) => {
