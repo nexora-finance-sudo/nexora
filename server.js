@@ -243,47 +243,36 @@ async function initDB() {
 
     await sqlite(sql);
 
-    try {
-        await sqlite("ALTER TABLE utilisateurs ADD COLUMN email TEXT");
-    } catch (error) {
-        if (!String(error.message).includes("duplicate column")) {
-            console.warn("Impossible d'ajouter email :", error.message);
-        }
-    }
-
-    try {
-        await sqlite("ALTER TABLE utilisateurs ADD COLUMN email_code TEXT");
-    } catch (error) {
-        if (!String(error.message).includes("duplicate column")) {
-            console.warn("Impossible d'ajouter email_code :", error.message);
-        }
-    }
-
-    try {
-        await sqlite("ALTER TABLE utilisateurs ADD COLUMN email_code_expiry DATETIME");
-    } catch (error) {
-        if (!String(error.message).includes("duplicate column")) {
-            console.warn("Impossible d'ajouter email_code_expiry :", error.message);
-        }
-    }
-
-    try {
-        await sqlite("ALTER TABLE utilisateurs ADD COLUMN abonnement_actif INTEGER DEFAULT 0");
-    } catch (error) {
-        if (!String(error.message).includes("duplicate column")) {
-            console.warn("Impossible d'ajouter abonnement_actif :", error.message);
-        }
-    }
-
-    try {
-        await sqlite("ALTER TABLE utilisateurs ADD COLUMN abonnement_expiration TEXT");
-    } catch (error) {
-        if (!String(error.message).includes("duplicate column")) {
-            console.warn("Impossible d'ajouter abonnement_expiration :", error.message);
-        }
-    }
+    await migrerTableUtilisateurs();
 
     console.log("Base NEXORA initialisée.");
+}
+
+const COLONNES_UTILISATEURS_ATTENDUES = [
+    { nom: "email", def: "TEXT" },
+    { nom: "email_code", def: "TEXT" },
+    { nom: "email_code_expiry", def: "DATETIME" },
+    { nom: "email_code_attempts", def: "INTEGER DEFAULT 0" },
+    { nom: "abonnement_actif", def: "INTEGER DEFAULT 0" },
+    { nom: "abonnement_expiration", def: "TEXT" },
+    { nom: "type_compte", def: "TEXT DEFAULT 'standard'" }
+];
+
+async function migrerTableUtilisateurs() {
+
+    const colonnesActuelles = await sqlite("PRAGMA table_info(utilisateurs)");
+    const nomsExistants = colonnesActuelles.map(col => col.name);
+
+    for (const colonne of COLONNES_UTILISATEURS_ATTENDUES) {
+        if (!nomsExistants.includes(colonne.nom)) {
+            try {
+                await sqlite(`ALTER TABLE utilisateurs ADD COLUMN ${colonne.nom} ${colonne.def}`);
+                console.log(`✅ Colonne ajoutée : ${colonne.nom}`);
+            } catch (error) {
+                console.warn(`❌ Erreur ajout ${colonne.nom} :`, error.message);
+            }
+        }
+    }
 }
 
 function hashPassword(password) {
