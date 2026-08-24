@@ -252,6 +252,14 @@ async function initDB() {
     }
 
     try {
+        await sqlite("ALTER TABLE utilisateurs ADD COLUMN email_code TEXT");
+    } catch (error) {
+        if (!String(error.message).includes("duplicate column")) {
+            console.warn("Impossible d'ajouter email_code :", error.message);
+        }
+    }
+
+    try {
         await sqlite("ALTER TABLE utilisateurs ADD COLUMN abonnement_actif INTEGER DEFAULT 0");
     } catch (error) {
         if (!String(error.message).includes("duplicate column")) {
