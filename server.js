@@ -176,7 +176,7 @@ async function sendVirementEmail(to, details) {
     });
 }
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const HOST = "0.0.0.0";
 const DB = path.join(__dirname, "nexora.db");
 
