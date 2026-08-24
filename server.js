@@ -317,7 +317,7 @@ function getSessionUserId(token) {
  * FedaPay soit traitée plusieurs fois.
  */
 
-(async function initialiserTablePaiementsPremium() {
+async function initialiserTablePaiementsPremium() {
 
     try {
 
@@ -354,7 +354,7 @@ function getSessionUserId(token) {
 
     }
 
-})();
+}
 
 async function getUserPublicById(id) {
 
@@ -1396,6 +1396,7 @@ async function handleRequest(req, res) {
 async function start() {
 
     await initDB();
+    await initialiserTablePaiementsPremium();
 
     const server =
         http.createServer((req, res) => {
