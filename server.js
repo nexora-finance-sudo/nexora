@@ -1037,7 +1037,7 @@ async function handleRequest(req, res) {
                 description: "Abonnement Premium NEXORA - 1 mois",
                 amount: 2400,
                 currency: { iso: "XOF" },
-                callback_url: "https://tondomaine.com/abonnement/confirmation",
+                callback_url: "https://nexora-dt02.onrender.com/abonnement/confirmation",
                 customer: {
                     firstname: utilisateur.prenom,
                     lastname: utilisateur.nom,
@@ -1054,11 +1054,17 @@ async function handleRequest(req, res) {
 
         } catch (error) {
 
-            console.error(error);
+            const detail =
+                (error && error.response && error.response.data) ? JSON.stringify(error.response.data) :
+                (error && error.message) ? error.message :
+                "Erreur inconnue.";
+
+            console.error("Erreur FedaPay (creation transaction) :", detail);
 
             sendJSON(res, 500, {
                 success: false,
-                message: "Erreur lors de la creation du paiement."
+                message: "Erreur lors de la creation du paiement.",
+                detail: detail
             });
 
         }
