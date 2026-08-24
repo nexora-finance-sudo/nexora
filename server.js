@@ -19,38 +19,66 @@ FedaPay.setApiKey(FEDAPAY_API_KEY);
 FedaPay.setEnvironment(FEDAPAY_ENVIRONMENT);
 
 
-const SMTP_USER = process.env.NEXORA_SMTP_USER;
-const SMTP_PASS = process.env.NEXORA_SMTP_PASS;
-
-// Adresse expéditeur VÉRIFIÉE dans Brevo (différente de SMTP_USER,
-// qui est juste l'identifiant de connexion SMTP)
+const BREVO_API_KEY = process.env.NEXORA_BREVO_API_KEY;
 const SENDER_EMAIL = process.env.NEXORA_SENDER_EMAIL || "banque.nexora@gmail.com";
 
-if (!SMTP_USER || !SMTP_PASS) {
-    console.warn(
-        "ATTENTION : variables SMTP Brevo manquantes (NEXORA_SMTP_USER / NEXORA_SMTP_PASS)."
-    );
+if (!BREVO_API_KEY) {
+    console.warn("ATTENTION : variable NEXORA_BREVO_API_KEY manquante.");
 }
 
-const mailer = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS
-    },
-    tls: {
-        minVersion: "TLSv1.2"
+async function sendBrevoEmail({ to, subject, text, html }) {
+    if (!BREVO_API_KEY) {
+        throw new Error("NEXORA_BREVO_API_KEY manquante.");
     }
-});
+
+    const payload = JSON.stringify({
+        sender: {
+            name: "NEXORA",
+            email: SENDER_EMAIL
+        },
+        to: [
+            {
+                email: to
+            }
+        ],
+        subject,
+        textContent: text,
+        htmlContent: html
+    });
+
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+            "accept": "application/json",
+            "api-key": BREVO_API_KEY,
+            "content-type": "application/json"
+        },
+        body: payload
+    });
+
+    const body = await response.text();
+
+    if (!response.ok) {
+        throw new Error(
+            `Brevo API HTTP ${response.status}: ${body.slice(0, 500)}`
+        );
+    }
+
+    let result = {};
+    try {
+        result = body ? JSON.parse(body) : {};
+    } catch (_) {}
+
+    console.log("Email Brevo envoyé avec succès. messageId :", result.messageId || "non fourni");
+
+    return result;
+}
 
 async function sendVerificationEmail(to, code) {
 
     console.log("Tentative d'envoi du code de verification a : " + to);
 
-    const result = await mailer.sendMail({
-        from: `"NEXORA" <${SENDER_EMAIL}>`,
+    const result = await sendBrevoEmail({
         to,
         subject: "Votre code de vérification NEXORA",
         text:
@@ -70,7 +98,7 @@ async function sendVerificationEmail(to, code) {
         `
     });
 
-    console.log("Email envoye avec succes. messageId : " + result.messageId);
+    return result;
 }
 
 function formaterDateHeureServeur(date) {
@@ -105,55 +133,7 @@ async function sendVirementEmail(to, details) {
             ? `Vous avez envoyé un virement à ${details.contrepartie} d'un montant de ${details.montant} ${details.devise}.`
             : `Vous avez reçu un virement de ${details.contrepartie} d'un montant de ${details.montant} ${details.devise}.`;
 
-    await mailer.sendMail({
-        from: `"NEXORA" <${SENDER_EMAIL}>`,
-        to,
-        subject: `NEXORA — ${titre}`,
-        text:
-            `${phrase}\n\n` +
-            `Motif : ${details.motif}\n` +
-            `Date : ${dateHeure}\n` +
-            `Référence : ${details.reference}`,
-        html: `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto">
-                <h2>NEXORA</h2>
-                <h3>${titre}</h3>
-                <p>${phrase}</p>
-                <table style="margin-top:16px;font-size:14px">
-                    <tr><td style="color:#7c8798;padding:4px 12px 4px 0">Motif</td><td><strong>${details.motif}</strong></td></tr>
-                    <tr><td style="color:#7c8798;padding:4px 12px 4px 0">Date</td><td><strong>${dateHeure}</strong></td></tr>
-                    <tr><td style="color:#7c8798;padding:4px 12px 4px 0">Référence</td><td><strong>${details.reference}</strong></td></tr>
-                </table>
-            </div>
-        `
-    });
-}
-
-function formaterDateHeureServeur(date) {
-    const jour = String(date.getDate()).padStart(2, "0");
-    const mois = String(date.getMonth() + 1).padStart(2, "0");
-    const annee = date.getFullYear();
-    const heures = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${jour}/${mois}/${annee} à ${heures}:${minutes}`;
-}
-
-async function sendVirementEmail(to, details) {
-
-    const dateHeure = formaterDateHeureServeur(new Date());
-
-    const titre =
-        details.sens === "envoye"
-            ? "Virement envoyé"
-            : "Virement reçu";
-
-    const phrase =
-        details.sens === "envoye"
-            ? `Vous avez envoyé un virement à ${details.contrepartie} d'un montant de ${details.montant} ${details.devise}.`
-            : `Vous avez reçu un virement de ${details.contrepartie} d'un montant de ${details.montant} ${details.devise}.`;
-
-    await mailer.sendMail({
-        from: `"NEXORA" <${SENDER_EMAIL}>`,
+    return sendBrevoEmail({
         to,
         subject: `NEXORA — ${titre}`,
         text:
