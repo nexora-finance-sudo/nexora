@@ -416,7 +416,51 @@ async function getUserPublicById(id) {
         utilisateur.abonnement_actif = 1;
     }
 
+    if (utilisateur.type_compte === "illimite") {
+        utilisateur.carte = genererCarteVirtuelle(utilisateur);
+    }
+
     return utilisateur;
+}
+
+function genererCarteVirtuelle(utilisateur) {
+
+    const secret =
+        process.env.NEXORA_CARTE_SECRET || "nexora-carte-prototype";
+
+    const hash = crypto
+        .createHmac("sha256", secret)
+        .update(String(utilisateur.id))
+        .digest("hex");
+
+    const chiffres = hash.replace(/[a-f]/g, "").slice(0, 12).padEnd(12, "4");
+
+    const numero =
+        "6390 " +
+        chiffres.slice(0, 4) + " " +
+        chiffres.slice(4, 8) + " " +
+        chiffres.slice(8, 12);
+
+    const cvv = hash.replace(/[a-f]/g, "").slice(12, 15).padEnd(3, "7");
+
+    const dateCreation = utilisateur.date_creation
+        ? new Date(utilisateur.date_creation)
+        : new Date();
+
+    const anneeExpiration =
+        (dateCreation.getFullYear() + 4).toString().slice(-2);
+
+    const moisExpiration = String(
+        dateCreation.getMonth() + 1
+    ).padStart(2, "0");
+
+    return {
+        numero,
+        expiration: moisExpiration + "/" + anneeExpiration,
+        cvv,
+        titulaire:
+            (utilisateur.prenom + " " + utilisateur.nom).toUpperCase()
+    };
 }
 
 function sendJSON(res, status, data) {
