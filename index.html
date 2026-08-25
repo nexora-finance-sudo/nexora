@@ -3004,7 +3004,7 @@ SOLDE DISPONIBLE
 
 <span id="balanceAmount">245 000</span>
 
-<small id="balanceCurrency">EUR</small>
+<small id="balanceCurrency">XOF</small>
 
 </div>
 
@@ -3455,7 +3455,7 @@ DEVISE
 <div class="field">
 <select id="currency">
 <option value="EUR">Euro (EUR)</option>
-<option value="FCFA">FCFA</option>
+<option value="XOF">FCFA</option>
 <option value="USD">Dollar US (USD)</option>
 <option value="GBP">Livre sterling (GBP)</option>
 <option value="CAD">Dollar canadien (CAD)</option>
@@ -5034,11 +5034,37 @@ function getSoldeKey(){
     return "nexora_solde";
 }
 
+function getDeviseCompte(){
+    if(currentUser && currentUser.devise_compte){
+        return String(currentUser.devise_compte).toUpperCase();
+    }
+
+    return "XOF";
+}
+
 function getSolde(){
+
+    /*
+     * PostgreSQL est la source de vérité.
+     * currentUser.solde provient du serveur via /api/session.
+     */
+    if(currentUser && currentUser.id){
+
+        const valeurServeur = Number(currentUser.solde);
+
+        if(Number.isFinite(valeurServeur) && valeurServeur >= 0){
+            return valeurServeur;
+        }
+    }
+
+    /*
+     * Secours uniquement lorsque le compte serveur
+     * n'est pas encore disponible.
+     */
     const stocke = localStorage.getItem(getSoldeKey());
 
     if(stocke === null){
-        return SOLDE_INITIAL;
+        return 0;
     }
 
     const valeur = Number(stocke);
@@ -5061,17 +5087,17 @@ function setSolde(valeur){
     }
 
     /*
-     * SEUL UN COMPTE "illimite" peut renouveler
-     * automatiquement son solde.
+     * Le solde serveur reste la source de vérité.
+     * On synchronise currentUser après une opération validée.
      */
-    if(
-        valeur <= 0 &&
-        currentUser &&
-        currentUser.type_compte === "illimite"
-    ){
-        valeur = SOLDE_INITIAL;
+    if(currentUser && currentUser.id){
+        currentUser.solde = valeur;
     }
 
+    /*
+     * Conservation locale uniquement pour l'affichage
+     * de secours. Elle ne décide plus du solde serveur.
+     */
     localStorage.setItem(
         getSoldeKey(),
         String(valeur)
@@ -5085,6 +5111,10 @@ function updateSoldeAffichage(){
     const el = document.getElementById("balanceAmount");
     if(el){
         el.textContent = money(solde);
+    }
+    const balanceCurrency = document.getElementById("balanceCurrency");
+    if(balanceCurrency){
+        balanceCurrency.textContent = getDeviseCompte();
     }
     const summaryBalance = document.getElementById("summaryBalance");
     if(summaryBalance){
@@ -5116,7 +5146,7 @@ money(amount)+" "+devise;
 
 const summaryBalance = document.getElementById("summaryBalance");
 if(summaryBalance){
-    summaryBalance.textContent = money(getSolde())+" EUR";
+    summaryBalance.textContent = money(getSolde())+" "+getDeviseCompte();
 }
 
 const recipientEl = document.getElementById("summaryRecipient");
@@ -5183,21 +5213,81 @@ async function send(event){
         return;
     }
 
-    const soldeActuel = getSolde();
+    const token = localStorage.getItem("nexora_token");
 
-    if(operationType !== "recevoir" && amount > soldeActuel){
-        alert("Solde insuffisant pour effectuer ce virement.");
+    if(!token){
+        alert("Votre session a expiré. Veuillez vous reconnecter.");
         return;
     }
 
-    const nouveauSolde =
-        operationType === "recevoir"
-            ? soldeActuel + amount
-            : soldeActuel - amount;
+    let ref = reference();
+    let nouveauSolde = getSolde();
 
-    setSolde(nouveauSolde);
+    /*
+     * VIREMENT SORTANT :
+     * Le serveur PostgreSQL est la source de vérité.
+     */
+    if(operationType !== "recevoir"){
 
-    const ref = reference();
+        try{
+
+            const response = await fetch("/api/virement", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    email_destinataire: recipientEmail,
+                    montant: amount,
+                    devise: currency,
+                    motif: motif || "Non précisé",
+                    reference: ref
+                })
+            });
+
+            const result = await response.json();
+
+            if(!response.ok || !result.success){
+
+                alert(
+                    result.message ||
+                    "Impossible d'effectuer le virement."
+                );
+
+                return;
+            }
+
+            nouveauSolde = Number(result.nouveau_solde);
+
+            setSolde(nouveauSolde);
+
+            ref = result.reference || ref;
+
+        }catch(error){
+
+            console.error(
+                "Erreur API virement :",
+                error
+            );
+
+            alert(
+                "Impossible de contacter le serveur. " +
+                "Le virement n'a pas été effectué."
+            );
+
+            return;
+        }
+
+    }else{
+
+        /*
+         * Réception locale conservée temporairement.
+         */
+        nouveauSolde = nouveauSolde + amount;
+
+        setSolde(nouveauSolde);
+    }
 
     document
         .getElementById("reference")

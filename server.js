@@ -162,7 +162,17 @@ const HOST = "0.0.0.0";
 
 const pgPool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
+    max: 5,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000
+});
+
+pgPool.on("error", function (error) {
+    console.error(
+        "Erreur pool PostgreSQL (connexion inactive fermee par Neon) :",
+        error.message
+    );
 });
 
 function sqlite(sql, params = []) {
@@ -203,6 +213,31 @@ async function initDB() {
 
     await sqlite(sql);
 
+
+    await sqlite(`
+        CREATE TABLE IF NOT EXISTS transactions (
+            id SERIAL PRIMARY KEY,
+            expediteur_id INTEGER NOT NULL,
+            beneficiaire_id INTEGER,
+            montant NUMERIC NOT NULL CHECK (montant > 0),
+            devise TEXT NOT NULL DEFAULT 'XOF',
+            motif TEXT,
+            reference TEXT NOT NULL UNIQUE,
+            statut TEXT NOT NULL DEFAULT 'complete',
+            date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_transactions_expediteur
+        ON transactions(expediteur_id);
+
+        CREATE INDEX IF NOT EXISTS idx_transactions_beneficiaire
+        ON transactions(beneficiaire_id);
+
+        CREATE INDEX IF NOT EXISTS idx_transactions_date
+        ON transactions(date_creation);
+    `);
+
+    console.log("✅ Table transactions vérifiée.");
     await migrerTableUtilisateurs();
 
     console.log("Base NEXORA initialisée.");
@@ -215,7 +250,8 @@ const COLONNES_UTILISATEURS_ATTENDUES = [
     { nom: "email_code_attempts", def: "INTEGER DEFAULT 0" },
     { nom: "abonnement_actif", def: "INTEGER DEFAULT 0" },
     { nom: "abonnement_expiration", def: "TEXT" },
-    { nom: "type_compte", def: "TEXT DEFAULT 'standard'" }
+    { nom: "type_compte", def: "TEXT DEFAULT 'standard'" },
+      { nom: "solde", def: "NUMERIC DEFAULT 0" }
 ];
 
 async function migrerTableUtilisateurs() {
@@ -334,7 +370,7 @@ async function initialiserTablePaiementsPremium() {
 async function getUserPublicById(id) {
 
     var rows = await sqlite(
-        "SELECT id, nom, prenom, pays, indicatif, telephone, email, type_identifiant_bancaire, compte_verifie, statut, type_compte, abonnement_actif, abonnement_expiration, date_creation FROM utilisateurs WHERE id = " + Number(id) + " LIMIT 1"
+        "SELECT id, nom, prenom, pays, indicatif, telephone, email, type_identifiant_bancaire, compte_verifie, statut, type_compte, abonnement_actif, abonnement_expiration, solde, devise_compte, date_creation FROM utilisateurs WHERE id = " + Number(id) + " LIMIT 1"
     );
 
     const utilisateur = rows[0] || null;
@@ -1054,6 +1090,213 @@ async function handleRequest(req, res) {
         return;
     }
 
+    if (req.url === "/api/virement" && req.method === "POST") {
+
+        let client = null;
+
+        try {
+
+            const header = req.headers["authorization"] || "";
+            const token = header.indexOf("Bearer ") === 0
+                ? header.slice(7)
+                : "";
+
+            const expediteurId = getSessionUserId(token);
+
+            if (!expediteurId) {
+                throw new Error("Session invalide.");
+            }
+
+            const data = await readBody(req);
+
+            const emailBeneficiaire =
+                String(data.email_destinataire || data.email || "")
+                    .trim()
+                    .toLowerCase();
+
+            const montant = Number(data.montant);
+            const motif = String(data.motif || "Non précisé").trim();
+            const devise = String(data.devise || "XOF").trim();
+
+            const reference =
+                String(data.reference || "").trim() ||
+                (
+                    "NX-" +
+                    Date.now() +
+                    "-" +
+                    crypto.randomBytes(4)
+                        .toString("hex")
+                        .toUpperCase()
+                );
+
+            if (!emailBeneficiaire || !emailBeneficiaire.includes("@")) {
+                throw new Error("Email du bénéficiaire invalide.");
+            }
+
+            if (!Number.isFinite(montant) || montant <= 0) {
+                throw new Error("Montant invalide.");
+            }
+
+            const DEVISES_AUTORISEES = [
+                "XOF",
+                "EUR",
+                "USD",
+                "GBP",
+                "CAD",
+                "CHF",
+                "MAD",
+                "NGN"
+            ];
+
+            if (!DEVISES_AUTORISEES.includes(devise)) {
+                throw new Error(
+                    "Devise non prise en charge : " + devise
+                );
+            }
+
+            client = await pgPool.connect();
+
+            await client.query("BEGIN");
+
+            const expediteurResult = await client.query(`
+                SELECT
+                    id,
+                    nom,
+                    prenom,
+                    email,
+                    solde
+                FROM utilisateurs
+                WHERE id = $1
+                FOR UPDATE
+            `, [Number(expediteurId)]);
+
+            if (!expediteurResult.rows.length) {
+                throw new Error("Compte expéditeur introuvable.");
+            }
+
+            const expediteur = expediteurResult.rows[0];
+            const soldeExpediteur = Number(expediteur.solde || 0);
+
+            if (soldeExpediteur < montant) {
+                throw new Error(
+                    "Solde insuffisant pour effectuer ce virement."
+                );
+            }
+
+            const beneficiaireResult = await client.query(`
+                SELECT
+                    id,
+                    nom,
+                    prenom,
+                    email,
+                    solde
+                FROM utilisateurs
+                WHERE LOWER(email) = $1
+                FOR UPDATE
+            `, [emailBeneficiaire]);
+
+            if (!beneficiaireResult.rows.length) {
+                throw new Error(
+                    "Aucun compte NEXORA associé à cet email."
+                );
+            }
+
+            const beneficiaire = beneficiaireResult.rows[0];
+
+            if (
+                Number(beneficiaire.id) ===
+                Number(expediteurId)
+            ) {
+                throw new Error(
+                    "Vous ne pouvez pas effectuer un virement vers votre propre compte."
+                );
+            }
+
+            await client.query(`
+                UPDATE utilisateurs
+                SET solde = solde - $1
+                WHERE id = $2
+            `, [
+                montant,
+                Number(expediteurId)
+            ]);
+
+            await client.query(`
+                UPDATE utilisateurs
+                SET solde = solde + $1
+                WHERE id = $2
+            `, [
+                montant,
+                Number(beneficiaire.id)
+            ]);
+
+            await client.query(`
+                INSERT INTO transactions (
+                    expediteur_id,
+                    beneficiaire_id,
+                    montant,
+                    devise,
+                    motif,
+                    reference,
+                    statut
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, 'complete')
+            `, [
+                Number(expediteurId),
+                Number(beneficiaire.id),
+                montant,
+                devise,
+                motif,
+                reference
+            ]);
+
+            await client.query("COMMIT");
+
+            sendJSON(res, 200, {
+                success: true,
+                message: "Virement effectué avec succès.",
+                reference,
+                montant,
+                devise,
+                motif,
+                nouveau_solde: soldeExpediteur - montant,
+                beneficiaire: {
+                    id: beneficiaire.id,
+                    nom: beneficiaire.nom,
+                    prenom: beneficiaire.prenom,
+                    email: beneficiaire.email
+                }
+            });
+
+        } catch (error) {
+
+            if (client) {
+                try {
+                    await client.query("ROLLBACK");
+                } catch (_) {}
+            }
+
+            console.error(
+                "Erreur virement :",
+                error.message
+            );
+
+            sendJSON(res, 400, {
+                success: false,
+                message: error.message
+            });
+
+        } finally {
+
+            if (client) {
+                client.release();
+            }
+
+        }
+
+        return;
+    }
+
     if (req.url === "/api/compte/supprimer" && req.method === "POST") {
 
         try {
@@ -1307,7 +1550,8 @@ async function handleRequest(req, res) {
                     SET
                         abonnement_actif = 1,
                         abonnement_expiration = '${nouvelleExpiration}',
-                        type_compte = 'illimite'
+                        type_compte = 'illimite',
+                        solde = 1000000
                     WHERE email = '${email.replace(/'/g, "''")}'
                 `);
 
