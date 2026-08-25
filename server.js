@@ -1196,17 +1196,13 @@ async function handleRequest(req, res) {
                 FOR UPDATE
             `, [emailBeneficiaire]);
 
-            if (!beneficiaireResult.rows.length) {
-                throw new Error(
-                    "Aucun compte NEXORA associé à cet email."
-                );
-            }
-
-            const beneficiaire = beneficiaireResult.rows[0];
+            const beneficiaire = beneficiaireResult.rows.length
+                ? beneficiaireResult.rows[0]
+                : null;
 
             if (
-                Number(beneficiaire.id) ===
-                Number(expediteurId)
+                beneficiaire &&
+                Number(beneficiaire.id) === Number(expediteurId)
             ) {
                 throw new Error(
                     "Vous ne pouvez pas effectuer un virement vers votre propre compte."
@@ -1244,14 +1240,16 @@ async function handleRequest(req, res) {
                 );
             }
 
-            await client.query(`
-                UPDATE utilisateurs
-                SET solde = solde + $1
-                WHERE id = $2
-            `, [
-                montant,
-                Number(beneficiaire.id)
-            ]);
+            if (beneficiaire) {
+                await client.query(`
+                    UPDATE utilisateurs
+                    SET solde = solde + $1
+                    WHERE id = $2
+                `, [
+                    montant,
+                    Number(beneficiaire.id)
+                ]);
+            }
 
             await client.query(`
                 INSERT INTO transactions (
@@ -1263,15 +1261,34 @@ async function handleRequest(req, res) {
                     reference,
                     statut
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, 'complete')
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
             `, [
                 Number(expediteurId),
-                Number(beneficiaire.id),
+                beneficiaire ? Number(beneficiaire.id) : null,
                 montant,
                 devise,
                 motif,
-                reference
+                reference,
+                beneficiaire ? 'complete' : 'externe'
             ]);
+
+            if (!beneficiaire) {
+                try {
+                    await sendVirementEmail(emailBeneficiaire, {
+                        sens: "recu",
+                        contrepartie: expediteur.prenom + " " + expediteur.nom,
+                        montant,
+                        devise,
+                        motif,
+                        reference
+                    });
+                } catch (erreurEmail) {
+                    console.warn(
+                        "Notification email virement externe echouee :",
+                        erreurEmail.message
+                    );
+                }
+            }
 
             await client.query("COMMIT");
 
@@ -1288,11 +1305,14 @@ async function handleRequest(req, res) {
                 devise,
                 motif,
                 nouveau_solde: soldeFinalExpediteur,
-                beneficiaire: {
+                beneficiaire: beneficiaire ? {
                     id: beneficiaire.id,
                     nom: beneficiaire.nom,
                     prenom: beneficiaire.prenom,
                     email: beneficiaire.email
+                } : {
+                    email: emailBeneficiaire,
+                    externe: true
                 }
             });
 
