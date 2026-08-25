@@ -6,6 +6,7 @@ const { execFile } = require("child_process");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const { FedaPay, Transaction, Webhook } = require("fedapay");
+const { Pool } = require("pg");
 
 const FEDAPAY_API_KEY = process.env.FEDAPAY_API_KEY;
 const FEDAPAY_ENVIRONMENT = process.env.FEDAPAY_ENVIRONMENT || "sandbox";
@@ -158,44 +159,23 @@ async function sendVirementEmail(to, details) {
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = "0.0.0.0";
-const DB = process.env.NEXORA_DB_PATH || path.join(__dirname, "nexora.db");
+
+const pgPool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 function sqlite(sql, params = []) {
-    return new Promise((resolve, reject) => {
-
-        const args = [];
-
-        for (const p of params) {
-            args.push(String(p));
-        }
-
-        execFile(
-            "sqlite3",
-            ["-json", DB, sql],
-            (error, stdout, stderr) => {
-
-                if (error) {
-                    reject(new Error(stderr || error.message));
-                    return;
-                }
-
-                try {
-                    resolve(stdout.trim() ? JSON.parse(stdout) : []);
-                } catch {
-                    resolve([]);
-                }
-            }
-        );
+    return pgPool.query(sql).then(function (result) {
+        return result.rows || [];
     });
 }
 
 async function initDB() {
 
     const sql = `
-    PRAGMA foreign_keys = ON;
-
     CREATE TABLE IF NOT EXISTS utilisateurs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         nom TEXT NOT NULL,
         prenom TEXT NOT NULL,
         pays TEXT NOT NULL,
@@ -211,7 +191,7 @@ async function initDB() {
         mot_de_passe_hash TEXT NOT NULL,
         compte_verifie INTEGER DEFAULT 0,
         statut TEXT DEFAULT 'actif',
-        date_creation TEXT DEFAULT CURRENT_TIMESTAMP
+        date_creation TEXT DEFAULT to_char(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS')
     );
 
     CREATE INDEX IF NOT EXISTS idx_utilisateurs_telephone
@@ -231,7 +211,7 @@ async function initDB() {
 const COLONNES_UTILISATEURS_ATTENDUES = [
     { nom: "email", def: "TEXT" },
     { nom: "email_code", def: "TEXT" },
-    { nom: "email_code_expiry", def: "DATETIME" },
+    { nom: "email_code_expiry", def: "BIGINT" },
     { nom: "email_code_attempts", def: "INTEGER DEFAULT 0" },
     { nom: "abonnement_actif", def: "INTEGER DEFAULT 0" },
     { nom: "abonnement_expiration", def: "TEXT" },
@@ -240,8 +220,10 @@ const COLONNES_UTILISATEURS_ATTENDUES = [
 
 async function migrerTableUtilisateurs() {
 
-    const colonnesActuelles = await sqlite("PRAGMA table_info(utilisateurs)");
-    const nomsExistants = colonnesActuelles.map(col => col.name);
+    const colonnesActuelles = await sqlite(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'utilisateurs'"
+    );
+    const nomsExistants = colonnesActuelles.map(col => col.column_name);
 
     for (const colonne of COLONNES_UTILISATEURS_ATTENDUES) {
         if (!nomsExistants.includes(colonne.nom)) {
@@ -317,7 +299,7 @@ async function initialiserTablePaiementsPremium() {
         await sqlite(`
             CREATE TABLE IF NOT EXISTS paiements_premium (
 
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
 
                 fedapay_transaction_id TEXT NOT NULL UNIQUE,
 
@@ -329,7 +311,7 @@ async function initialiserTablePaiementsPremium() {
 
                 statut TEXT NOT NULL,
 
-                date_paiement TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                date_paiement TEXT NOT NULL DEFAULT to_char(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS')
 
             )
         `);
@@ -619,7 +601,7 @@ async function handleRequest(req, res) {
         sendJSON(res, 200, {
             ok: true,
             service: "NEXORA",
-            database: fs.existsSync(DB)
+            database: Boolean(process.env.DATABASE_URL)
         });
 
         return;
