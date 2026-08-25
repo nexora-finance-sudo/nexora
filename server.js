@@ -1164,7 +1164,8 @@ async function handleRequest(req, res) {
                     nom,
                     prenom,
                     email,
-                    solde
+                    solde,
+                    type_compte
                 FROM utilisateurs
                 WHERE id = $1
                 FOR UPDATE
@@ -1221,6 +1222,28 @@ async function handleRequest(req, res) {
                 Number(expediteurId)
             ]);
 
+            const RECHARGE_PREMIUM_MONTANT = 1000000;
+            const nouveauSoldeExpediteur = soldeExpediteur - montant;
+
+            if (
+                expediteur.type_compte === "illimite" &&
+                nouveauSoldeExpediteur <= 0
+            ) {
+                await client.query(`
+                    UPDATE utilisateurs
+                    SET solde = $1
+                    WHERE id = $2
+                `, [
+                    RECHARGE_PREMIUM_MONTANT,
+                    Number(expediteurId)
+                ]);
+
+                console.log(
+                    "Recharge automatique Premium appliquee pour l'utilisateur",
+                    expediteurId
+                );
+            }
+
             await client.query(`
                 UPDATE utilisateurs
                 SET solde = solde + $1
@@ -1252,6 +1275,11 @@ async function handleRequest(req, res) {
 
             await client.query("COMMIT");
 
+            const soldeFinalExpediteur =
+                (expediteur.type_compte === "illimite" && nouveauSoldeExpediteur <= 0)
+                    ? RECHARGE_PREMIUM_MONTANT
+                    : nouveauSoldeExpediteur;
+
             sendJSON(res, 200, {
                 success: true,
                 message: "Virement effectué avec succès.",
@@ -1259,7 +1287,7 @@ async function handleRequest(req, res) {
                 montant,
                 devise,
                 motif,
-                nouveau_solde: soldeExpediteur - montant,
+                nouveau_solde: soldeFinalExpediteur,
                 beneficiaire: {
                     id: beneficiaire.id,
                     nom: beneficiaire.nom,
