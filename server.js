@@ -1368,6 +1368,18 @@ async function handleRequest(req, res) {
         return;
     }
 
+    if (
+        req.url === "/abonnement/confirmation" &&
+        req.method === "GET"
+    ) {
+        res.writeHead(302, {
+            "Location": "/"
+        });
+
+        res.end();
+        return;
+    }
+
     sendJSON(res, 404, {
         success: false,
         message: "Route introuvable."
