@@ -1369,7 +1369,7 @@ async function handleRequest(req, res) {
     }
 
     if (
-        req.url === "/abonnement/confirmation" &&
+        new URL(req.url, "http://localhost").pathname === "/abonnement/confirmation" &&
         req.method === "GET"
     ) {
         res.writeHead(302, {
