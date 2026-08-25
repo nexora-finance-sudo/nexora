@@ -3079,6 +3079,54 @@ En savoir plus sur Premium
 
     </div>
 
+    <div id="nexoraCarteWrap" style="perspective:1200px;max-width:400px;margin:22px 0;">
+        <div id="nexoraCarte" style="position:relative;width:100%;aspect-ratio:1.586;transition:transform .6s;transform-style:preserve-3d;cursor:pointer;">
+
+            <div style="position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;background:linear-gradient(135deg,#0b1b3a,#1d3a8f 55%,#3272ed);box-shadow:0 18px 40px rgba(29,58,143,.35);padding:22px;color:white;display:flex;flex-direction:column;justify-content:space-between;">
+
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div style="font-weight:800;font-size:15px;letter-spacing:1px;">NEXORA</div>
+                    <div style="font-size:9px;opacity:.75;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:2px 6px;">PREMIUM</div>
+                </div>
+
+                <div>
+                    <div id="carteNumero" style="font-size:19px;letter-spacing:2px;font-weight:700;font-family:monospace;margin-bottom:14px;">•••• •••• •••• ••••</div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+                        <div>
+                            <div style="font-size:8px;opacity:.65;">TITULAIRE</div>
+                            <div id="carteTitulaire" style="font-size:12px;font-weight:700;">—</div>
+                        </div>
+                        <div>
+                            <div style="font-size:8px;opacity:.65;">EXPIRE</div>
+                            <div id="carteExpiration" style="font-size:12px;font-weight:700;">••/••</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);border-radius:18px;background:linear-gradient(135deg,#111827,#1f2937);box-shadow:0 18px 40px rgba(0,0,0,.3);display:flex;flex-direction:column;">
+
+                <div style="height:38px;background:#000;margin-top:18px;"></div>
+
+                <div style="padding:16px 22px;display:flex;flex-direction:column;gap:8px;">
+                    <div style="background:white;border-radius:4px;padding:8px 10px;display:flex;justify-content:flex-end;">
+                        <span id="carteCvv" style="font-family:monospace;color:#111;font-size:13px;letter-spacing:2px;">•••</span>
+                    </div>
+                    <div style="font-size:8px;color:#9ca3af;">Prototype visuel NEXORA — non utilisable pour un paiement réel.</div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div style="max-width:400px;margin:-10px 0 22px 0;display:flex;gap:10px;">
+        <button type="button" onclick="basculerCarte()" style="flex:1;border:1px solid var(--line,#e2e6ee);background:#fbfcfe;border-radius:10px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;">Retourner la carte</button>
+        <button type="button" onclick="basculerVisibiliteCarte()" style="flex:1;border:1px solid var(--line,#e2e6ee);background:#fbfcfe;border-radius:10px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;" id="btnVisibiliteCarte">Afficher les infos</button>
+    </div>
+
 
     <div class="premium-stats">
 
@@ -4089,9 +4137,65 @@ async function register(event){
 
 let currentUser = null;
 
+let carteVisible = false;
+
+function basculerCarte(){
+    const carte = document.getElementById("nexoraCarte");
+    if(carte){
+        carte.style.transform =
+            carte.style.transform === "rotateY(180deg)"
+                ? "rotateY(0deg)"
+                : "rotateY(180deg)";
+    }
+}
+
+function basculerVisibiliteCarte(){
+    carteVisible = !carteVisible;
+
+    const numero = document.getElementById("carteNumero");
+    const cvv = document.getElementById("carteCvv");
+    const bouton = document.getElementById("btnVisibiliteCarte");
+    const donnees = currentUser && currentUser.carte;
+
+    if(!donnees){
+        return;
+    }
+
+    if(carteVisible){
+        if(numero) numero.textContent = donnees.numero;
+        if(cvv) cvv.textContent = donnees.cvv;
+        if(bouton) bouton.textContent = "Masquer les infos";
+    }else{
+        if(numero) numero.textContent = "•••• •••• •••• " + donnees.numero.slice(-4);
+        if(cvv) cvv.textContent = "•••";
+        if(bouton) bouton.textContent = "Afficher les infos";
+    }
+}
+
+function afficherCarteVirtuelle(user){
+
+    const donnees = user && user.carte;
+
+    if(!donnees){
+        return;
+    }
+
+    const titulaire = document.getElementById("carteTitulaire");
+    const expiration = document.getElementById("carteExpiration");
+    const numero = document.getElementById("carteNumero");
+
+    if(titulaire) titulaire.textContent = donnees.titulaire;
+    if(expiration) expiration.textContent = donnees.expiration;
+    if(numero) numero.textContent = "•••• •••• •••• " + donnees.numero.slice(-4);
+
+    carteVisible = false;
+}
+
 function enterDashboard(user){
 
     currentUser = user;
+
+    afficherCarteVirtuelle(user);
 
     const firstName =
         user.prenom || "";
