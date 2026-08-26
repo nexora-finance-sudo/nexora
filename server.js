@@ -1177,7 +1177,7 @@ async function handleRequest(req, res) {
 
             const transaction = await Transaction.create({
                 description: "Abonnement Premium NEXORA - 1 mois",
-                amount: 25,
+                amount: 2400,
                 currency: { iso: "XOF" },
                 callback_url: "https://nexora-dt02.onrender.com/abonnement/confirmation",
                 customer: {
@@ -1571,7 +1571,7 @@ async function handleRequest(req, res) {
                     );
                 }
 
-                if (montant !== 25) {
+                if (montant !== 2400) {
                     throw new Error(
                         "Webhook Premium refusé : montant incorrect."
                     );
@@ -1657,7 +1657,7 @@ async function handleRequest(req, res) {
                     VALUES (
                         '${transactionId.replace(/'/g, "''")}',
                         '${email.replace(/'/g, "''")}',
-                        25,
+                        2400,
                         'XOF',
                         'approved'
                     )
