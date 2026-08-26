@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script>
+if(localStorage.getItem("nexora_token")){
+    document.documentElement.classList.add("restoring-session");
+}
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>NEXORA — Espace financier</title>
@@ -38,6 +43,12 @@ button{cursor:pointer}
 
 .screen{display:none}
 .screen.active{display:block}
+
+#preAppLoader{display:none;position:fixed;inset:0;background:var(--bg);z-index:99999;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+html.restoring-session #homeScreen{display:none !important}
+html.restoring-session #preAppLoader{display:flex !important}
+@keyframes preAppSpin{to{transform:rotate(360deg)}}
+.pre-app-spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue);animation:preAppSpin .8s linear infinite}
 
 /* =========================
    ACCUEIL
@@ -2297,6 +2308,10 @@ transition:background .15s ease,box-shadow .15s ease;
 </head>
 
 <body>
+<div id="preAppLoader">
+    <div class="pre-app-spinner"></div>
+    <div style="font-weight:800;letter-spacing:2px;color:var(--muted);font-size:12px">NEXORA</div>
+</div>
 
 <!-- =====================================================
      ACCUEIL
@@ -3041,9 +3056,16 @@ GEORGES MERVÉDI
 
 </section>
 
-<div style="display:flex;justify-content:flex-end;margin-top:14px;">
-<button id="btnPremium" onclick="openPremiumModal()" style="border:1px solid var(--gold);background:linear-gradient(135deg,#3272ed,#1d4ed8);color:white;padding:14px 22px;border-radius:11px;font-size:11px;font-weight:800;box-shadow:0 0 0 1px rgba(212,175,55,.35),0 10px 23px rgba(212,175,55,.25);">
-En savoir plus sur Premium
+<div style="margin-top:14px;">
+<style>
+@keyframes premiumBtnPulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(50,114,237,.55),0 10px 23px rgba(212,175,55,.25); }
+    50%{ box-shadow:0 0 0 12px rgba(50,114,237,0),0 10px 23px rgba(212,175,55,.25); }
+}
+#btnPremium{ animation:premiumBtnPulse 2.4s ease-in-out infinite; }
+</style>
+<button id="btnPremium" onclick="openPremiumModal()" style="width:100%;border:1px solid var(--gold);background:linear-gradient(135deg,#3272ed,#1d4ed8);color:white;padding:16px 22px;border-radius:12px;font-size:12.5px;font-weight:800;">
+✨ En savoir plus sur Premium
 </button>
 </div>
 
@@ -3823,8 +3845,15 @@ Vers un bénéficiaire
 
 </div>
 
-<button>Voir tout</button>
+<div style="display:flex;gap:8px;">
+<button id="btnSelectionnerTx" onclick="toggleModeSelectionTransactions()" style="font-size:11px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);">Sélectionner</button>
+<button id="btnVoirTout" onclick="toggleVueCompleteTransactions()">Voir tout</button>
+</div>
 
+</div>
+
+<div id="toolbarSuppressionTx" style="display:none;justify-content:flex-end;margin-bottom:8px;">
+<button onclick="supprimerTransactionsSelectionnees()" style="font-size:11px;padding:8px 14px;border-radius:8px;border:none;background:var(--red);color:#fff;font-weight:700;">Supprimer la sélection</button>
 </div>
 
 <div id="recentTransactionsList">
@@ -4205,6 +4234,137 @@ Télécharger le reçu
 </div>
 <div style="font-size:20px;">🎧</div>
 </div>
+
+<style>
+.vitrine-carte-wrap{
+    perspective:1200px;
+    width:100%;
+    max-width:300px;
+    margin:4px auto 20px;
+}
+.vitrine-carte-scene{
+    position:relative;
+    width:100%;
+    aspect-ratio:1.586/1;
+    transform-style:preserve-3d;
+    animation:vitrineCarteFlip 8s ease-in-out infinite;
+}
+.vitrine-carte-face{
+    position:absolute;
+    inset:0;
+    border-radius:16px;
+    backface-visibility:hidden;
+    padding:18px;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    box-shadow:0 18px 40px rgba(10,30,70,.28);
+}
+.vitrine-carte-recto{
+    background:linear-gradient(135deg,#07101f 0%,#0b1730 30%,#123b86 65%,#1767d8 100%);
+}
+.vitrine-carte-verso{
+    background:linear-gradient(145deg,#080b10,#111a2c);
+    transform:rotateY(180deg);
+    padding:0;
+}
+.vitrine-carte-bande{
+    width:100%;
+    height:38px;
+    background:#0a0d14;
+    margin-top:20px;
+}
+.vitrine-carte-cvv-zone{
+    margin:18px 18px 0;
+    background:#fff;
+    border-radius:6px;
+    height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    padding:0 10px;
+    color:#111;
+    font-family:'Courier New',monospace;
+    font-size:12px;
+    letter-spacing:2px;
+}
+.vitrine-carte-marque{
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:3px;
+}
+.vitrine-carte-puce{
+    width:38px;
+    height:28px;
+    border-radius:6px;
+    margin-top:6px;
+    background:linear-gradient(135deg,#a66b20,#f7df94 28%,#d0a94e 52%,#fff0ad 70%,#9c681e);
+}
+.vitrine-carte-numero{
+    font-family:'Courier New',monospace;
+    font-size:15px;
+    letter-spacing:2.5px;
+    font-weight:600;
+    margin-top:8px;
+}
+.vitrine-carte-bas{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+}
+.vitrine-carte-label{
+    font-size:6.5px;
+    letter-spacing:1.2px;
+    opacity:.6;
+    margin-bottom:2px;
+}
+.vitrine-carte-valeur{
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+.vitrine-carte-caption{
+    text-align:center;
+    font-size:10.5px;
+    color:var(--muted);
+    margin-top:-10px;
+    margin-bottom:16px;
+}
+@keyframes vitrineCarteFlip{
+    0%,45%{ transform:rotateY(0deg); }
+    50%,95%{ transform:rotateY(180deg); }
+    100%{ transform:rotateY(360deg); }
+}
+</style>
+
+<div class="vitrine-carte-wrap">
+    <div class="vitrine-carte-scene">
+
+        <div class="vitrine-carte-face vitrine-carte-recto">
+            <div class="vitrine-carte-marque">NEXORA</div>
+            <div class="vitrine-carte-puce"></div>
+            <div class="vitrine-carte-numero">•••• •••• •••• ••••</div>
+            <div class="vitrine-carte-bas">
+                <div>
+                    <div class="vitrine-carte-label">CARDHOLDER</div>
+                    <div class="vitrine-carte-valeur">VOTRE NOM</div>
+                </div>
+                <div>
+                    <div class="vitrine-carte-label">VALID THRU</div>
+                    <div class="vitrine-carte-valeur">••/••</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vitrine-carte-face vitrine-carte-verso">
+            <div class="vitrine-carte-bande"></div>
+            <div class="vitrine-carte-cvv-zone">•••</div>
+        </div>
+
+    </div>
+</div>
+<div class="vitrine-carte-caption">Une carte virtuelle est incluse avec cet abonnement</div>
 
 <button id="btnPremiumConfirm" onclick="passerPremium()" class="premium-cta" style="width:100%;border:1px solid var(--gold);padding:16px;border-radius:12px;font-size:13px;font-weight:800;background:linear-gradient(135deg,#3272ed,#1d4ed8);color:white;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
 <span>Devenir Premium — 2 400 FCFA/mois</span>
@@ -5554,6 +5714,12 @@ formArea.style.display="block";
 
 success.classList.remove("show");
 
+const btnEnvoyerReset = document.querySelector(".send");
+if(btnEnvoyerReset){
+    btnEnvoyerReset.disabled = false;
+    btnEnvoyerReset.textContent = "Vérifier et envoyer";
+}
+
 },250);
 
 }
@@ -5771,6 +5937,14 @@ async function send(event){
         return;
     }
 
+    const btnEnvoyer = event.target.querySelector(".send");
+    const texteEnvoyerOriginal = btnEnvoyer ? btnEnvoyer.textContent : "";
+
+    if(btnEnvoyer){
+        btnEnvoyer.disabled = true;
+        btnEnvoyer.textContent = "Vérification et envoi...";
+    }
+
     let ref = reference();
     let nouveauSolde = getSolde();
 
@@ -5806,6 +5980,11 @@ async function send(event){
                     "Impossible d'effectuer le virement."
                 );
 
+                if(btnEnvoyer){
+                    btnEnvoyer.disabled = false;
+                    btnEnvoyer.textContent = texteEnvoyerOriginal;
+                }
+
                 return;
             }
 
@@ -5827,6 +6006,11 @@ async function send(event){
                 "Le virement n'a pas été effectué."
             );
 
+            if(btnEnvoyer){
+                btnEnvoyer.disabled = false;
+                btnEnvoyer.textContent = texteEnvoyerOriginal;
+            }
+
             return;
         }
 
@@ -5843,6 +6027,11 @@ async function send(event){
     document
         .getElementById("reference")
         .textContent = ref;
+
+    if(btnEnvoyer){
+        btnEnvoyer.disabled = false;
+        btnEnvoyer.textContent = texteEnvoyerOriginal;
+    }
 
     formArea.style.display = "none";
     success.classList.add("show");
@@ -6049,12 +6238,68 @@ function saveTransaction(tx){
     );
 }
 
+let vueCompleteTransactions = false;
+let modeSelectionTransactions = false;
+let transactionsSelectionnees = new Set();
+
+function toggleVueCompleteTransactions(){
+    vueCompleteTransactions = !vueCompleteTransactions;
+    modeSelectionTransactions = false;
+    transactionsSelectionnees.clear();
+    const btn = document.getElementById("btnVoirTout");
+    if(btn){ btn.textContent = vueCompleteTransactions ? "Réduire" : "Voir tout"; }
+    renderTransactions();
+}
+
+function toggleModeSelectionTransactions(){
+    modeSelectionTransactions = !modeSelectionTransactions;
+    transactionsSelectionnees.clear();
+    const btn = document.getElementById("btnSelectionnerTx");
+    if(btn){ btn.textContent = modeSelectionTransactions ? "Annuler" : "Sélectionner"; }
+    renderTransactions();
+}
+
+function toggleSelectionTransaction(reference, event){
+    event.stopPropagation();
+    if(transactionsSelectionnees.has(reference)){
+        transactionsSelectionnees.delete(reference);
+    }else{
+        transactionsSelectionnees.add(reference);
+    }
+    renderTransactions();
+}
+
+function supprimerTransactionsSelectionnees(){
+    if(transactionsSelectionnees.size === 0){ return; }
+    if(!confirm("Supprimer " + transactionsSelectionnees.size + " transaction(s) de votre historique ? Cette action ne peut pas être annulée.")){
+        return;
+    }
+    const liste = getTransactions().filter(function(tx){
+        return !transactionsSelectionnees.has(tx.reference);
+    });
+    localStorage.setItem(getTransactionsKey(), JSON.stringify(liste));
+    transactionsSelectionnees.clear();
+    modeSelectionTransactions = false;
+    const btn = document.getElementById("btnSelectionnerTx");
+    if(btn){ btn.textContent = "Sélectionner"; }
+    renderTransactions();
+    refreshPremiumDashboard();
+}
+
 function renderTransactions(){
 
-    const list = getTransactions().slice(0, 5);
+    const listeComplete = getTransactions();
+    const list = vueCompleteTransactions ? listeComplete : listeComplete.slice(0, 5);
 
     const recentEl = document.getElementById("recentTransactionsList");
     const notifEl = document.getElementById("notificationsList");
+    const toolbar = document.getElementById("toolbarSuppressionTx");
+
+    if(toolbar){
+        toolbar.style.display =
+            (modeSelectionTransactions && transactionsSelectionnees.size > 0)
+                ? "flex" : "none";
+    }
 
     if(recentEl){
         if(list.length === 0){
@@ -6062,7 +6307,18 @@ function renderTransactions(){
         }else{
             recentEl.innerHTML = list.map(function(tx, i){
                 const isOut = tx.sens === "envoyer";
-                return '<div class="transaction" style="cursor:pointer" onclick="showTransactionDetail('+i+')">'+
+                const coche = transactionsSelectionnees.has(tx.reference);
+
+                const caseACocher = modeSelectionTransactions
+                    ? '<input type="checkbox" '+(coche?"checked":"")+' onclick="toggleSelectionTransaction(\''+tx.reference+'\', event)" style="width:18px;height:18px;margin-right:10px;flex-shrink:0;">'
+                    : '';
+
+                const clicRow = modeSelectionTransactions
+                    ? ''
+                    : ' onclick="showTransactionDetail('+i+')"';
+
+                return '<div class="transaction" style="cursor:pointer;display:flex;align-items:center;"'+clicRow+'>'+
+                    caseACocher +
                     '<div class="tx-icon '+(isOut?"tx-out":"tx-in")+'">'+(isOut?"↑":"↓")+'</div>'+
                     '<div class="tx-info">'+
                         '<strong>'+(isOut?"Vers ":"De ")+tx.contrepartie+'</strong>'+
@@ -6099,7 +6355,7 @@ function renderTransactions(){
 ===================================================== */
 
 
-function updatePremiumDashboard(){
+async function updatePremiumDashboard(){
 
     const dashboard =
         document.getElementById("premiumDashboard");
@@ -6108,7 +6364,34 @@ function updatePremiumDashboard(){
         return;
     }
 
-    const transactions = getTransactions();
+    let transactions = [];
+
+    try {
+
+        const token = localStorage.getItem("nexora_token");
+
+        if(token){
+
+            const reponse = await fetch("/api/transactions", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            const resultat = await reponse.json();
+
+            if(resultat && resultat.success && Array.isArray(resultat.transactions)){
+                transactions = resultat.transactions;
+            }
+        }
+
+    } catch (erreur) {
+        console.error("Erreur recuperation transactions reelles :", erreur);
+    }
+
+    if(!transactions.length){
+        // Repli sur le stockage local si le serveur est injoignable,
+        // pour ne jamais casser l'affichage.
+        transactions = getTransactions();
+    }
 
     let entrees = 0;
     let sorties = 0;
@@ -6756,6 +7039,7 @@ closeModal();
     const token = localStorage.getItem("nexora_token");
 
     if(!token){
+        document.documentElement.classList.remove("restoring-session");
         return;
     }
 
@@ -6779,11 +7063,14 @@ closeModal();
             localStorage.removeItem("nexora_token");
         }
 
+        document.documentElement.classList.remove("restoring-session");
+
     })
     .catch(function(error){
 
         localStorage.removeItem("nexora_user");
         localStorage.removeItem("nexora_token");
+        document.documentElement.classList.remove("restoring-session");
     });
 
 })();
@@ -6803,6 +7090,30 @@ if ("serviceWorker" in navigator) {
             });
     });
 }
+</script>
+
+
+<div id="diagErreurs" style="display:none;position:fixed;top:0;left:0;right:0;
+z-index:999999;background:#df4d5b;color:#fff;font-family:monospace;
+font-size:12px;padding:10px;max-height:40vh;overflow:auto;white-space:pre-wrap;"></div>
+
+<script>
+(function(){
+    var zone = document.getElementById("diagErreurs");
+
+    function afficherErreur(texte){
+        zone.style.display = "block";
+        zone.textContent += texte + "\n\n";
+    }
+
+    window.addEventListener("error", function(e){
+        afficherErreur("ERREUR JS : " + e.message + " (ligne " + e.lineno + ")");
+    });
+
+    window.addEventListener("unhandledrejection", function(e){
+        afficherErreur("PROMESSE REJETEE : " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+    });
+})();
 </script>
 
 </body>
