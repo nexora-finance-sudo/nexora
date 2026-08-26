@@ -5,19 +5,10 @@ const path = require("path");
 const { execFile } = require("child_process");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
-const { FedaPay, Transaction, Webhook } = require("fedapay");
+
 const { Pool } = require("pg");
 
-const FEDAPAY_API_KEY = process.env.FEDAPAY_API_KEY;
-const FEDAPAY_ENVIRONMENT = process.env.FEDAPAY_ENVIRONMENT || "sandbox";
-const FEDAPAY_WEBHOOK_SECRET = process.env.FEDAPAY_WEBHOOK_SECRET;
 
-if (!FEDAPAY_API_KEY) {
-    console.warn("ATTENTION : variable FEDAPAY_API_KEY manquante.");
-}
-
-FedaPay.setApiKey(FEDAPAY_API_KEY);
-FedaPay.setEnvironment(FEDAPAY_ENVIRONMENT);
 
 
 const BREVO_API_KEY = process.env.NEXORA_BREVO_API_KEY;
@@ -250,7 +241,7 @@ const COLONNES_UTILISATEURS_ATTENDUES = [
     { nom: "email_code_attempts", def: "INTEGER DEFAULT 0" },
     { nom: "abonnement_actif", def: "INTEGER DEFAULT 0" },
     { nom: "abonnement_expiration", def: "TEXT" },
-    { nom: "type_compte", def: "TEXT DEFAULT 'standard'" },
+    { nom: "type_compte", def: "TEXT DEFAULT 'illimite'" },
       { nom: "solde", def: "NUMERIC DEFAULT 0" }
 ];
 
@@ -319,106 +310,36 @@ function getSessionUserId(token) {
 }
 
 
-/*
- * ============================================================
- * TABLE DES PAIEMENTS PREMIUM
- * ============================================================
- *
- * Cette table permet d'empêcher qu'une même transaction
- * FedaPay soit traitée plusieurs fois.
- */
-
-async function initialiserTablePaiementsPremium() {
-
-    try {
-
-        await sqlite(`
-            CREATE TABLE IF NOT EXISTS paiements_premium (
-
-                id SERIAL PRIMARY KEY,
-
-                fedapay_transaction_id TEXT NOT NULL UNIQUE,
-
-                email TEXT NOT NULL,
-
-                montant INTEGER NOT NULL,
-
-                devise TEXT NOT NULL,
-
-                statut TEXT NOT NULL,
-
-                date_paiement TEXT NOT NULL DEFAULT to_char(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS')
-
-            )
-        `);
-
-        console.log(
-            "✅ Table paiements_premium vérifiée."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "❌ Erreur table paiements_premium :",
-            error.message
-        );
-
-    }
-
-}
-
 async function getUserPublicById(id) {
 
-    var rows = await sqlite(
-        "SELECT id, nom, prenom, pays, indicatif, telephone, email, type_identifiant_bancaire, compte_verifie, statut, type_compte, abonnement_actif, abonnement_expiration, solde, devise_compte, date_creation FROM utilisateurs WHERE id = " + Number(id) + " LIMIT 1"
+    const rows = await sqlite(
+        "SELECT id, nom, prenom, pays, indicatif, telephone, email, type_identifiant_bancaire, compte_verifie, statut, type_compte, solde, devise_compte, date_creation FROM utilisateurs WHERE id = " +
+        Number(id) +
+        " LIMIT 1"
     );
 
     const utilisateur = rows[0] || null;
 
-    if(!utilisateur){
+    if (!utilisateur) {
         return null;
     }
 
-    const expiration = utilisateur.abonnement_expiration
-        ? new Date(utilisateur.abonnement_expiration)
-        : null;
-
-    const premiumValide =
-        utilisateur.type_compte === "illimite" &&
-        Number(utilisateur.abonnement_actif) === 1 &&
-        expiration &&
-        Number.isFinite(expiration.getTime()) &&
-        expiration.getTime() > Date.now();
+    /*
+     * NEXORA possède un seul type de compte.
+     * Tous les utilisateurs ont accès à toutes les fonctionnalités.
+     */
+    utilisateur.type_compte = "illimite";
 
     /*
-     * Le serveur est la source de vérité.
-     * Si l'abonnement est expiré, on repasse automatiquement
-     * le compte en standard.
+     * On conserve PostgreSQL comme source de vérité
+     * pour le solde.
      */
-    if(!premiumValide){
+    utilisateur.solde = Number(utilisateur.solde || 0);
 
-        if(
-            utilisateur.type_compte === "illimite" ||
-            Number(utilisateur.abonnement_actif) === 1
-        ){
-            await sqlite(
-                "UPDATE utilisateurs SET type_compte = 'standard', abonnement_actif = 0 WHERE id = " +
-                Number(id)
-            );
-        }
-
-        utilisateur.type_compte = "standard";
-        utilisateur.abonnement_actif = 0;
-
-    }else{
-
-        utilisateur.type_compte = "illimite";
-        utilisateur.abonnement_actif = 1;
-    }
-
-    if (utilisateur.type_compte === "illimite") {
-        utilisateur.carte = genererCarteVirtuelle(utilisateur);
-    }
+    /*
+     * Carte virtuelle disponible pour tous les comptes.
+     */
+    utilisateur.carte = genererCarteVirtuelle(utilisateur);
 
     return utilisateur;
 }
@@ -633,7 +554,7 @@ async function createUser(data) {
             '${emailCode}',
             ${emailCodeExpiry},
             0,
-            'standard',
+            'illimite',
             1000000
         )
     `);
@@ -1156,64 +1077,6 @@ async function handleRequest(req, res) {
         return;
     }
 
-    if (req.url === "/api/abonnement/payer" && req.method === "POST") {
-
-        try {
-
-            const header = req.headers["authorization"] || "";
-            const token = header.indexOf("Bearer ") === 0 ? header.slice(7) : "";
-
-            const userId = getSessionUserId(token);
-
-            if (!userId) {
-                throw new Error("Session invalide.");
-            }
-
-            const utilisateur = await getUserPublicById(userId);
-
-            if (!utilisateur) {
-                throw new Error("Compte introuvable.");
-            }
-
-            const transaction = await Transaction.create({
-                description: "Abonnement Premium NEXORA - 1 mois",
-                amount: 25,
-                currency: { iso: "XOF" },
-                callback_url: "https://nexora-dt02.onrender.com/abonnement/confirmation",
-                customer: {
-                    firstname: utilisateur.prenom,
-                    lastname: utilisateur.nom,
-                    email: utilisateur.email
-                }
-            });
-
-            const fedapayToken = await transaction.generateToken();
-
-            sendJSON(res, 200, {
-                success: true,
-                url: fedapayToken.url
-            });
-
-        } catch (error) {
-
-            const detail =
-                (error && error.response && error.response.data) ? JSON.stringify(error.response.data) :
-                (error && error.message) ? error.message :
-                "Erreur inconnue.";
-
-            console.error("Erreur FedaPay (creation transaction) :", detail);
-
-            sendJSON(res, 500, {
-                success: false,
-                message: "Erreur lors de la creation du paiement.",
-                detail: detail
-            });
-
-        }
-
-        return;
-    }
-
     if (req.url === "/api/virement" && req.method === "POST") {
 
         let client = null;
@@ -1342,7 +1205,7 @@ async function handleRequest(req, res) {
                 Number(expediteurId)
             ]);
 
-            const RECHARGE_PREMIUM_MONTANT = 1000000;
+            const MONTANT_RECHARGE_AUTOMATIQUE = 1000000;
             const nouveauSoldeExpediteur = soldeExpediteur - montant;
 
             if (
@@ -1354,12 +1217,12 @@ async function handleRequest(req, res) {
                     SET solde = $1
                     WHERE id = $2
                 `, [
-                    RECHARGE_PREMIUM_MONTANT,
+                    MONTANT_RECHARGE_AUTOMATIQUE,
                     Number(expediteurId)
                 ]);
 
                 console.log(
-                    "Recharge automatique Premium appliquee pour l'utilisateur",
+                    "Recharge automatique de 1 000 000 FCFA appliquee pour l'utilisateur",
                     expediteurId
                 );
             }
@@ -1418,7 +1281,7 @@ async function handleRequest(req, res) {
 
             const soldeFinalExpediteur =
                 (expediteur.type_compte === "illimite" && nouveauSoldeExpediteur <= 0)
-                    ? RECHARGE_PREMIUM_MONTANT
+                    ? MONTANT_RECHARGE_AUTOMATIQUE
                     : nouveauSoldeExpediteur;
 
             sendJSON(res, 200, {
@@ -1503,258 +1366,6 @@ async function handleRequest(req, res) {
         return;
     }
 
-    if (req.url === "/api/webhooks/fedapay" && req.method === "POST") {
-
-        try {
-
-            const rawBody = await readRawBody(req);
-            const signature = req.headers["x-fedapay-signature"];
-
-            const event = Webhook.constructEvent(
-                rawBody,
-                signature,
-                FEDAPAY_WEBHOOK_SECRET
-            );
-
-            if (event.name === "transaction.approved") {
-
-                const entity = event.entity || {};
-
-                /*
-                 * =====================================================
-                 * SECURITE PREMIUM
-                 * =====================================================
-                 */
-
-                const transactionId =
-                    String(entity.id || "").trim();
-
-                const email =
-                    String(
-                        entity.customer &&
-                        entity.customer.email
-                            ? entity.customer.email
-                            : ""
-                    )
-                    .trim()
-                    .toLowerCase();
-
-                const montant =
-                    Number(entity.amount);
-
-                const devise =
-                    String(
-                        entity.currency &&
-                        entity.currency.iso
-                            ? entity.currency.iso
-                            : ""
-                    )
-                    .trim()
-                    .toUpperCase();
-
-                const description =
-                    String(entity.description || "").trim();
-
-                /*
-                 * L'identifiant FedaPay est obligatoire.
-                 */
-
-                if (!transactionId) {
-                    throw new Error(
-                        "Webhook Premium refusé : identifiant transaction absent."
-                    );
-                }
-
-                if (!email) {
-                    throw new Error(
-                        "Webhook Premium refusé : email absent."
-                    );
-                }
-
-                if (montant !== 25) {
-                    throw new Error(
-                        "Webhook Premium refusé : montant incorrect."
-                    );
-                }
-
-                if (devise !== "XOF") {
-                    throw new Error(
-                        "Webhook Premium refusé : devise incorrecte."
-                    );
-                }
-
-                if (
-                    description !==
-                    "Abonnement Premium NEXORA - 1 mois"
-                ) {
-                    throw new Error(
-                        "Webhook Premium refusé : description incorrecte."
-                    );
-                }
-
-                /*
-                 * =====================================================
-                 * PROTECTION CONTRE LE DOUBLE TRAITEMENT
-                 * =====================================================
-                 */
-
-                const paiementExistant =
-                    await sqlite(
-                        "SELECT id, statut FROM paiements_premium " +
-                        "WHERE fedapay_transaction_id = '" +
-                        transactionId.replace(/'/g, "''") +
-                        "' LIMIT 1"
-                    );
-
-                if (paiementExistant[0]) {
-
-                    console.log(
-                        "ℹ️ Transaction Premium déjà traitée :",
-                        transactionId
-                    );
-
-                    sendJSON(res, 200, {
-                        received: true,
-                        already_processed: true
-                    });
-
-                    return;
-                }
-
-                /*
-                 * =====================================================
-                 * VERIFICATION DU COMPTE
-                 * =====================================================
-                 */
-
-                const utilisateurs =
-                    await sqlite(
-                        "SELECT id FROM utilisateurs WHERE email = '" +
-                        email.replace(/'/g, "''") +
-                        "' LIMIT 1"
-                    );
-
-                if (!utilisateurs[0]) {
-                    throw new Error(
-                        "Webhook Premium refusé : compte introuvable."
-                    );
-                }
-
-                /*
-                 * =====================================================
-                 * ENREGISTREMENT DU PAIEMENT
-                 * =====================================================
-                 */
-
-                await sqlite(`
-                    INSERT INTO paiements_premium (
-                        fedapay_transaction_id,
-                        email,
-                        montant,
-                        devise,
-                        statut
-                    )
-                    VALUES (
-                        '${transactionId.replace(/'/g, "''")}',
-                        '${email.replace(/'/g, "''")}',
-                        2400,
-                        'XOF',
-                        'approved'
-                    )
-                `);
-
-                /*
-                 * =====================================================
-                 * ACTIVATION PREMIUM
-                 * =====================================================
-                 */
-
-                /*
-                 * =====================================================
-                 * CALCUL DE L'EXPIRATION PREMIUM
-                 * =====================================================
-                 *
-                 * Si l'utilisateur possède encore du Premium,
-                 * le nouveau mois est ajouté à son expiration actuelle.
-                 *
-                 * Sinon, le nouveau mois commence maintenant.
-                 */
-
-                const utilisateursPremium =
-                    await sqlite(
-                        "SELECT abonnement_expiration " +
-                        "FROM utilisateurs WHERE email = '" +
-                        email.replace(/'/g, "''") +
-                        "' LIMIT 1"
-                    );
-
-                let baseExpiration = new Date();
-
-                if (
-                    utilisateursPremium[0] &&
-                    utilisateursPremium[0].abonnement_expiration
-                ) {
-
-                    const ancienneExpiration =
-                        new Date(
-                            utilisateursPremium[0].abonnement_expiration
-                        );
-
-                    if (
-                        !Number.isNaN(
-                            ancienneExpiration.getTime()
-                        ) &&
-                        ancienneExpiration.getTime() > Date.now()
-                    ) {
-                        baseExpiration = ancienneExpiration;
-                    }
-                }
-
-                baseExpiration.setMonth(
-                    baseExpiration.getMonth() + 1
-                );
-
-                const nouvelleExpiration =
-                    baseExpiration.toISOString();
-
-                await sqlite(`
-                    UPDATE utilisateurs
-                    SET
-                        abonnement_actif = 1,
-                        abonnement_expiration = '${nouvelleExpiration}',
-                        type_compte = 'illimite',
-                        solde = 1000000
-                    WHERE email = '${email.replace(/'/g, "''")}'
-                `);
-
-                console.log(
-                    "✅ Nouvelle expiration Premium :",
-                    nouvelleExpiration
-                );
-
-                console.log(
-                    "✅ Paiement Premium enregistré et abonnement activé :",
-                    transactionId,
-                    email
-                );
-            }
-
-            sendJSON(res, 200, { received: true });
-
-        } catch (error) {
-
-            console.error("Webhook Fedapay invalide :", error.message);
-
-            sendJSON(res, 400, {
-                success: false,
-                message: "Signature invalide."
-            });
-
-        }
-
-        return;
-    }
-
     if (req.url === "/" ||
         req.url === "/index.html") {
 
@@ -1805,9 +1416,7 @@ async function handleRequest(req, res) {
 async function start() {
 
     await initDB();
-    await initialiserTablePaiementsPremium();
-
-    const server =
+const server =
         http.createServer((req, res) => {
 
             handleRequest(req, res)

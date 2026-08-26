@@ -6531,6 +6531,12 @@ async function updatePremiumDashboard(){
 
 function updatePremiumChart(transactions){
 
+    console.log("📊 GRAPHE NEXORA — mise à jour");
+    console.log("📊 Nombre de transactions :", transactions ? transactions.length : 0);
+    console.log("📊 Solde actuel :", getSolde());
+
+
+
     const svg =
         document.querySelector(".premium-chart-svg");
 
