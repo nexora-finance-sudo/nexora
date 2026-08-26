@@ -3847,7 +3847,6 @@ Vers un bénéficiaire
 
 <div style="display:flex;gap:8px;">
 <button id="btnSelectionnerTx" onclick="toggleModeSelectionTransactions()" style="font-size:11px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);">Sélectionner</button>
-<button id="btnVoirTout" onclick="toggleVueCompleteTransactions()">Voir tout</button>
 </div>
 
 </div>
@@ -6238,18 +6237,8 @@ function saveTransaction(tx){
     );
 }
 
-let vueCompleteTransactions = false;
 let modeSelectionTransactions = false;
 let transactionsSelectionnees = new Set();
-
-function toggleVueCompleteTransactions(){
-    vueCompleteTransactions = !vueCompleteTransactions;
-    modeSelectionTransactions = false;
-    transactionsSelectionnees.clear();
-    const btn = document.getElementById("btnVoirTout");
-    if(btn){ btn.textContent = vueCompleteTransactions ? "Réduire" : "Voir tout"; }
-    renderTransactions();
-}
 
 function toggleModeSelectionTransactions(){
     modeSelectionTransactions = !modeSelectionTransactions;
@@ -6289,7 +6278,7 @@ function supprimerTransactionsSelectionnees(){
 function renderTransactions(){
 
     const listeComplete = getTransactions();
-    const list = vueCompleteTransactions ? listeComplete : listeComplete.slice(0, 5);
+    const list = listeComplete.slice(0, 5);
 
     const recentEl = document.getElementById("recentTransactionsList");
     const notifEl = document.getElementById("notificationsList");
