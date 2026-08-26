@@ -624,7 +624,8 @@ async function createUser(data) {
             email_code,
             email_code_expiry,
             email_code_attempts,
-            type_compte
+            type_compte,
+            solde
         )
         VALUES (
             ${escaped.join(",")},
@@ -632,7 +633,8 @@ async function createUser(data) {
             '${emailCode}',
             ${emailCodeExpiry},
             0,
-            'standard'
+            'standard',
+            1000000
         )
     `);
 
@@ -653,6 +655,7 @@ async function createUser(data) {
             compte_verifie,
             statut,
             type_compte,
+            solde,
             date_creation
         FROM utilisateurs
         WHERE telephone = '${telephone.replace(/'/g, "''")}'
@@ -923,6 +926,7 @@ async function handleRequest(req, res) {
                     compte_verifie,
                     statut,
                     type_compte,
+                    solde,
                     date_creation
                 FROM utilisateurs
                 WHERE id = ${Number(user.id)}
@@ -1062,6 +1066,82 @@ async function handleRequest(req, res) {
             sendJSON(res, 200, {
                 success: true,
                 utilisateur: utilisateur
+            });
+
+        } catch (error) {
+
+            sendJSON(res, 401, {
+                success: false,
+                message: error.message
+            });
+
+        }
+
+        return;
+    }
+
+    if (req.url === "/api/transactions" && req.method === "GET") {
+
+        try {
+
+            const header = req.headers["authorization"] || "";
+            const token = header.indexOf("Bearer ") === 0 ? header.slice(7) : "";
+
+            const userId = getSessionUserId(token);
+
+            if (!userId) {
+                throw new Error("Session invalide.");
+            }
+
+            const rows = await sqlite(`
+                SELECT
+                    t.id,
+                    t.expediteur_id,
+                    t.beneficiaire_id,
+                    t.montant,
+                    t.devise,
+                    t.motif,
+                    t.reference,
+                    t.statut,
+                    t.date_creation,
+                    exp.nom AS expediteur_nom,
+                    exp.prenom AS expediteur_prenom,
+                    ben.nom AS beneficiaire_nom,
+                    ben.prenom AS beneficiaire_prenom
+                FROM transactions t
+                LEFT JOIN utilisateurs exp ON exp.id = t.expediteur_id
+                LEFT JOIN utilisateurs ben ON ben.id = t.beneficiaire_id
+                WHERE t.expediteur_id = ${Number(userId)}
+                   OR t.beneficiaire_id = ${Number(userId)}
+                ORDER BY t.date_creation DESC
+                LIMIT 200
+            `);
+
+            const transactions = rows.map(function (row) {
+
+                const estExpediteur =
+                    Number(row.expediteur_id) === Number(userId);
+
+                const contrepartie = estExpediteur
+                    ? ([row.beneficiaire_prenom, row.beneficiaire_nom].filter(Boolean).join(" ") || "Externe")
+                    : ([row.expediteur_prenom, row.expediteur_nom].filter(Boolean).join(" ") || "NEXORA");
+
+                return {
+                    id: row.id,
+                    sens: estExpediteur ? "envoyer" : "recevoir",
+                    montant: Number(row.montant),
+                    devise: row.devise,
+                    motif: row.motif,
+                    reference: row.reference,
+                    statut: row.statut,
+                    date: row.date_creation,
+                    contrepartie: contrepartie
+                };
+            });
+
+            sendJSON(res, 200, {
+                success: true,
+                transactions: transactions
             });
 
         } catch (error) {
