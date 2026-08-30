@@ -3019,7 +3019,7 @@ SOLDE DISPONIBLE
 
 <span id="balanceAmount">245 000</span>
 
-<small id="balanceCurrency">XOF</small>
+<small id="balanceCurrency">EUR</small>
 
 </div>
 
@@ -5751,11 +5751,8 @@ function getSoldeKey(){
 }
 
 function getDeviseCompte(){
-    if(currentUser && currentUser.devise_compte){
-        return String(currentUser.devise_compte).toUpperCase();
-    }
-
-    return "XOF";
+    // NEXORA utilise EUR comme devise d'affichage
+    return "EUR";
 }
 
 function getSolde(){
@@ -6179,7 +6176,7 @@ async function notifierVirementRecu(details){
     }
 
     const dateHeure = formaterDateHeure(new Date());
-    const montantFormate = money(details.montant) + " FCFA";
+    const montantFormate = money(details.montant) + " EUR";
 
     const registration = await navigator.serviceWorker.ready;
 
@@ -6482,7 +6479,7 @@ async function updatePremiumDashboard(){
                 signe +
                 money(tx.montant) +
                 " " +
-                (tx.devise || "FCFA");
+                (tx.devise || "EUR");
 
         }
 
